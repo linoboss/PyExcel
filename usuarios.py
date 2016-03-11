@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'usuarios.ui'
 #
-# Created: Wed Mar  9 03:04:16 2016
+# Created: Fri Mar 11 14:23:58 2016
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,7 +31,7 @@ class Ui_Dialog(object):
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.tableWidget = QtGui.QTableWidget(Dialog)
         self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
-        self.tableWidget.setColumnCount(3)
+        self.tableWidget.setColumnCount(4)
         self.tableWidget.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
@@ -39,6 +39,8 @@ class Ui_Dialog(object):
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtGui.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(3, item)
         self.gridLayout.addWidget(self.tableWidget, 0, 0, 1, 1)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
@@ -65,6 +67,8 @@ class Ui_Dialog(object):
         item.setText(_translate("Dialog", "Horario", None))
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("Dialog", "Activo?", None))
+        item = self.tableWidget.horizontalHeaderItem(3)
+        item.setText(_translate("Dialog", "Numero", None))
         self.botonGuardar.setText(_translate("Dialog", "Guardar", None))
         self.botonCancelar.setText(_translate("Dialog", "Cancelar", None))
 

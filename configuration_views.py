@@ -16,7 +16,7 @@ class Usuarios(QTableWidgetHelper,
         self.setupUi(self)
         self.activeTable = self.tableWidget
 
-        self.tableWidget.setColumnCount(3)
+        self.tableWidget.setColumnCount(4)
         database = sql.Setup()
 
         workerstable = database.getWorkersTable()
