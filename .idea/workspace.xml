@@ -1,7 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9cd007d4-b0e2-4593-8089-14b8212ea817" name="Default" comment="" />
+    <list default="true" id="9cd007d4-b0e2-4593-8089-14b8212ea817" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controlasistenciasonidosguayana/5-2015 Mayo.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controlasistenciasonidosguayana/6-2015 Junio.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controlasistenciasonidosguayana/7-2015 Julio.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controlasistenciasonidosguayana/8-2015 Agosto.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/.name" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/control_de_personal.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/encodings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/scopes/scope_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/vcs.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/.idea/workspace.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/GUI prototype.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/GUI.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/GUI.ui" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/Libro2.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/control_asistencias.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/controlasistenciasonidosguayana.zip" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/ejemplo.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/prueba.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/pyExcel_organizar_archivo_asistencias.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/pyExcel_organizar_archivo_asistenciasV2.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/reporte persoal.xls" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/reporte persoal_modificado.xls" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/reporte personal.xls" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/reporte_personal_1004.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/reporte_personal_1004.xls" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/older version/setup.py" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="PyExcel.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -104,7 +134,7 @@
       <file leaf-file-name="tabla.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tabla.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.39215687">
+            <state vertical-scroll-proportion="0.6193078">
               <caret line="20" column="33" selection-start-line="20" selection-start-column="33" selection-end-line="20" selection-end-column="33" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -136,6 +166,9 @@
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="true" />
     </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -190,7 +223,7 @@
       </profile-state>
     </entry>
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -509,9 +542,9 @@
     <frame x="-8" y="-8" width="1416" height="1026" extended-state="1" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23512337" sideWeight="0.49399656" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23512337" sideWeight="0.49399656" order="2" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31731844" sideWeight="0.4975018" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3553459" sideWeight="0.5959004" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35458612" sideWeight="0.5959004" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33966482" sideWeight="0.46538186" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19666183" sideWeight="0.39933443" order="0" side_tool="false" content_ui="tabs" />
@@ -980,7 +1013,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tabla.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.39215687">
+        <state vertical-scroll-proportion="0.6193078">
           <caret line="20" column="33" selection-start-line="20" selection-start-column="33" selection-end-line="20" selection-end-column="33" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
