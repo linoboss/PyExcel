@@ -94,14 +94,14 @@ class Setup:
         # set up some constants
         pass
 
-    def addWorker(self, worker, horario, status):
+    def addWorker(self, worker, horario, status, numero):
         MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
 
         con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
         cur = con.cursor()
 
-        SQLcommand = "INSERT INTO Trabajadores (Nombre, Horario, Status) VALUES ('{}', '{}', {});"\
-            .format(worker, horario, status)  # your query goes here
+        SQLcommand = "INSERT INTO Trabajadores (Nombre, Horario, Status, Numero) VALUES ('{}', '{}', {}, '{}');"\
+            .format(worker, horario, status, numero)  # your query goes here
         cur.execute(SQLcommand)
         con.commit()
 
@@ -120,9 +120,15 @@ class Setup:
             workerId[str(row[1])] = row[0]
         return workerId
 
-    #def modifyWorker(self, nombre, horario, status):
+    def modifyWorker(self, id, nombre, status, horario, numero):
+        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
 
+        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
+        cur = con.cursor()
 
+        SQLcommand = "UPDATE Trabajadores SET Nombre='{}', Status={}, Horario='{}', Numero={} WHERE Id={};"\
+            .format(nombre, status, horario, numero, id)
+        cur.execute(SQLcommand)
 
 
     def getWorkerStatus(self):
@@ -146,7 +152,7 @@ class Setup:
         con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
         cur = con.cursor()
 
-        SQLcommand = "SELECT Id, Nombre,Horario,Status FROM Trabajadores" # your query goes here
+        SQLcommand = "SELECT * FROM Trabajadores" # your query goes here
         workerstatus_table = cur.execute(SQLcommand)
         return workerstatus_table.fetchall()
 

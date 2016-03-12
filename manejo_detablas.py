@@ -31,12 +31,10 @@ class QTableWidgetHelper:
         rowcount = self.activeTable.rowCount()
         for y in range(0, rowcount):
             row = []
-            for x in range(0,headercount):
+            for x in range(0, headercount):
                 row.append(self.activeTable.item(y, x).text())
             content.append(row)
-        from pprint import pprint
-        pprint(content)
-
+        return content
 
 
 

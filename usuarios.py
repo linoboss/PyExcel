@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'usuarios.ui'
 #
-# Created: Fri Mar 11 14:23:58 2016
+# Created: Fri Mar 11 21:44:17 2016
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(400, 300)
+        Dialog.resize(404, 300)
         self.gridLayout = QtGui.QGridLayout(Dialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.tableWidget = QtGui.QTableWidget(Dialog)
@@ -55,6 +55,23 @@ class Ui_Dialog(object):
         self.botonCancelar.setObjectName(_fromUtf8("botonCancelar"))
         self.horizontalLayout.addWidget(self.botonCancelar)
         self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.botonAgregar = QtGui.QPushButton(Dialog)
+        self.botonAgregar.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.botonAgregar.setObjectName(_fromUtf8("botonAgregar"))
+        self.verticalLayout.addWidget(self.botonAgregar)
+        self.botonModificar = QtGui.QPushButton(Dialog)
+        self.botonModificar.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.botonModificar.setObjectName(_fromUtf8("botonModificar"))
+        self.verticalLayout.addWidget(self.botonModificar)
+        self.botonEliminar = QtGui.QPushButton(Dialog)
+        self.botonEliminar.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.botonEliminar.setObjectName(_fromUtf8("botonEliminar"))
+        self.verticalLayout.addWidget(self.botonEliminar)
+        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem1)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 1, 1, 1)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -71,4 +88,7 @@ class Ui_Dialog(object):
         item.setText(_translate("Dialog", "Numero", None))
         self.botonGuardar.setText(_translate("Dialog", "Guardar", None))
         self.botonCancelar.setText(_translate("Dialog", "Cancelar", None))
+        self.botonAgregar.setText(_translate("Dialog", "Agregar", None))
+        self.botonModificar.setText(_translate("Dialog", "Modificar", None))
+        self.botonEliminar.setText(_translate("Dialog", "Eliminar", None))
 

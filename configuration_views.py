@@ -4,6 +4,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, pyqtSlot
 from manejo_detablas import QTableWidgetHelper
 import sql
+from pprint import pprint
 
 
 class Usuarios(QTableWidgetHelper,
@@ -19,14 +20,38 @@ class Usuarios(QTableWidgetHelper,
         self.tableWidget.setColumnCount(4)
         database = sql.Setup()
 
-        workerstable = database.getWorkersTable()
-        self.tableWidget.setRowCount(len(workerstable))
-        for i, w, h, s in workerstable:
-            self.append([w, h, str(s)])
+        self.workerstable = database.getWorkersTable()
+        self.tableWidget.setRowCount(len(self.workerstable))
+
+        for i, w, s, h, n in self.workerstable:
+            self.append([w, h, str(s), str(n)])
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     @pyqtSlot()
     def on_botonGuardar_clicked(self):
-        self.getTableContent()
+        pprint(self.getTableContent())
+        table = self.workerstable
+
+        for t in table:
+            print(t)
+            database = sql.Setup()
+            database.modifyWorker(*t)
+
+    @pyqtSlot()
+    def on_botonAgregar_clicked(self):
+        print('agregar')
+
+    @pyqtSlot()
+    def on_botonModificar_clicked(self):
+        print("Modificar")
+
+    @pyqtSlot()
+    def on_botonEliminar_clicked(self):
+        print("eliminar")
+
+
+
 
     def on_botonCancelar_clicked(self):
         self.close()
