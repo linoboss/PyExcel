@@ -41,8 +41,8 @@ class Usuarios(QTableWidgetHelper,
 
     @pyqtSlot()
     def on_botonAgregar_clicked(self):
-        nt.Control(self)
-
+        a = nt.Control(self)
+        a.show()
 
     @pyqtSlot()
     def on_botonModificar_clicked(self):

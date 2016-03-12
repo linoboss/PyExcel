@@ -1,7 +1,7 @@
 import sys
 import nuevo_trabajador
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QObject, pyqtSlot
+from PyQt4.QtCore import QObject, pyqtSlot, Qt
 import sql
 from pprint import pprint
 
@@ -14,7 +14,8 @@ class Control(QDialog,
         horarios = ("diurno", "nocturno")
         for h in horarios:
             self.comboBoxHorario.addItem(h)
-        self.lineEditNumero.setValidator(QIntValidator(0,10000))
+        self.lineEditNumero.setValidator(QIntValidator(0, 10000))
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
     @pyqtSlot()
     def on_botonListo_clicked(self):
@@ -27,7 +28,6 @@ class Control(QDialog,
     @pyqtSlot()
     def on_botonCancelar_clicked(self):
         self.close()
-
 
 
 if __name__ == "__main__":
