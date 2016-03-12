@@ -5,6 +5,7 @@ from PyQt4.QtCore import QObject, pyqtSlot
 from manejo_detablas import QTableWidgetHelper
 import sql
 from pprint import pprint
+import nuevo_trabajador_control as nt
 
 
 class Usuarios(QTableWidgetHelper,
@@ -40,7 +41,8 @@ class Usuarios(QTableWidgetHelper,
 
     @pyqtSlot()
     def on_botonAgregar_clicked(self):
-        print('agregar')
+        nt.Control(self)
+
 
     @pyqtSlot()
     def on_botonModificar_clicked(self):

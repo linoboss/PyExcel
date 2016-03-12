@@ -2,17 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9cd007d4-b0e2-4593-8089-14b8212ea817" name="Default" comment="Agregado campo Numero a usuarios">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/nuevo_trabajador.ui" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/nuevo_trabajador.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/nuevo_trabajador_control.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Att2003.mdb" afterPath="$PROJECT_DIR$/Att2003.mdb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/usuarios.ui" afterPath="$PROJECT_DIR$/usuarios.ui" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nuevo_trabajador.ui" afterPath="$PROJECT_DIR$/nuevo_trabajador.ui" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Setup.accdb" afterPath="$PROJECT_DIR$/Setup.accdb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/configuration_views.py" afterPath="$PROJECT_DIR$/configuration_views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/manejo_detablas.py" afterPath="$PROJECT_DIR$/manejo_detablas.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nuevo_trabajador.py" afterPath="$PROJECT_DIR$/nuevo_trabajador.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nuevo_trabajador_control.py" afterPath="$PROJECT_DIR$/nuevo_trabajador_control.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sql.py" afterPath="$PROJECT_DIR$/sql.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/usuarios.py" afterPath="$PROJECT_DIR$/usuarios.py" />
     </list>
     <ignored path="PyExcel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -37,7 +33,7 @@
         <entry file="file://$PROJECT_DIR$/configuration_views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+              <caret line="39" column="37" selection-start-line="39" selection-start-column="37" selection-end-line="39" selection-end-column="37" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -49,7 +45,7 @@
         <entry file="file://$PROJECT_DIR$/usuarios.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="84" column="40" selection-start-line="84" selection-start-column="40" selection-end-line="84" selection-end-column="40" />
+              <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -68,8 +64,20 @@
       <file leaf-file-name="nuevo_trabajador_control.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nuevo_trabajador_control.py">
           <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.33633092">
+              <caret line="11" column="38" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="44" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="nuevo_trabajador.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/nuevo_trabajador.py">
+          <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <caret line="66" column="52" selection-start-line="66" selection-start-column="52" selection-end-line="66" selection-end-column="52" />
               <folding />
             </state>
           </provider>
@@ -79,7 +87,7 @@
         <entry file="file://$PROJECT_DIR$/sql.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="131" column="0" selection-start-line="131" selection-start-column="0" selection-end-line="131" selection-end-column="0" />
+              <caret line="113" column="0" selection-start-line="113" selection-start-column="0" selection-end-line="113" selection-end-column="0" />
               <folding>
                 <element signature="e#48#61#0" expanded="true" />
               </folding>
@@ -118,9 +126,9 @@
         <option value="$PROJECT_DIR$/mainview_controller.py" />
         <option value="$PROJECT_DIR$/tabla.py" />
         <option value="$PROJECT_DIR$/manejo_detablas.py" />
+        <option value="$PROJECT_DIR$/usuarios.py" />
         <option value="$PROJECT_DIR$/sql.py" />
         <option value="$PROJECT_DIR$/configuration_views.py" />
-        <option value="$PROJECT_DIR$/usuarios.py" />
         <option value="$PROJECT_DIR$/nuevo_trabajador_control.py" />
       </list>
     </option>
@@ -186,8 +194,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -208,6 +214,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -261,23 +269,6 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="sql" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="PyExcel" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sql.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
     <configuration default="false" name="qhorario" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -308,6 +299,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="PyExcel" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tabla.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="nuevo_trabajador_control" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="PyExcel" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nuevo_trabajador_control.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -437,17 +445,17 @@
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.mainview_controller" />
       <item index="1" class="java.lang.String" itemvalue="Python.configuration_views" />
-      <item index="2" class="java.lang.String" itemvalue="Python.sql" />
-      <item index="3" class="java.lang.String" itemvalue="Python.qhorario" />
-      <item index="4" class="java.lang.String" itemvalue="Python.tabla" />
+      <item index="2" class="java.lang.String" itemvalue="Python.qhorario" />
+      <item index="3" class="java.lang.String" itemvalue="Python.tabla" />
+      <item index="4" class="java.lang.String" itemvalue="Python.nuevo_trabajador_control" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.configuration_views" />
-        <item index="1" class="java.lang.String" itemvalue="Python.mainview_controller" />
-        <item index="2" class="java.lang.String" itemvalue="Python.tabla" />
-        <item index="3" class="java.lang.String" itemvalue="Python.qhorario" />
-        <item index="4" class="java.lang.String" itemvalue="Python.sql" />
+        <item index="1" class="java.lang.String" itemvalue="Python.nuevo_trabajador_control" />
+        <item index="2" class="java.lang.String" itemvalue="Python.mainview_controller" />
+        <item index="3" class="java.lang.String" itemvalue="Python.tabla" />
+        <item index="4" class="java.lang.String" itemvalue="Python.qhorario" />
       </list>
     </recent_temporary>
   </component>
@@ -484,14 +492,14 @@
     <frame x="-8" y="0" width="1412" height="1026" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24235807" sideWeight="0.49399656" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24235807" sideWeight="0.49399656" order="2" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31731844" sideWeight="0.4975018" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34748602" sideWeight="0.13609898" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34748602" sideWeight="0.15065502" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33892617" sideWeight="0.46298984" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34748602" sideWeight="0.863901" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34748602" sideWeight="0.84934497" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19666183" sideWeight="0.39933443" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273743" sideWeight="0.4323144" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273743" sideWeight="0.4243086" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19666183" sideWeight="0.60066557" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3988827" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -557,13 +565,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/to_excel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="35" column="8" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/performance.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -889,19 +890,9 @@
     <entry file="file://$PROJECT_DIR$/sql.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="131" column="0" selection-start-line="131" selection-start-column="0" selection-end-line="131" selection-end-column="0" />
+          <caret line="113" column="0" selection-start-line="113" selection-start-column="0" selection-end-line="113" selection-end-column="0" />
           <folding>
             <element signature="e#48#61#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configuration_views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -909,7 +900,7 @@
     <entry file="file://$PROJECT_DIR$/usuarios.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="84" column="40" selection-start-line="84" selection-start-column="40" selection-end-line="84" selection-end-column="40" />
+          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -922,11 +913,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nuevo_trabajador_control.py">
+    <entry file="file://$PROJECT_DIR$/configuration_views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="39" column="37" selection-start-line="39" selection-start-column="37" selection-end-line="39" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nuevo_trabajador.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="66" column="52" selection-start-line="66" selection-start-column="52" selection-end-line="66" selection-end-column="52" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nuevo_trabajador_control.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33633092">
+          <caret line="11" column="38" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

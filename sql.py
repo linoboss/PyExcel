@@ -94,14 +94,15 @@ class Setup:
         # set up some constants
         pass
 
-    def addWorker(self, worker, horario, status, numero):
+    def addWorker(self, worker, status, horario, numero):
         MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
 
         con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
         cur = con.cursor()
 
-        SQLcommand = "INSERT INTO Trabajadores (Nombre, Horario, Status, Numero) VALUES ('{}', '{}', {}, '{}');"\
-            .format(worker, horario, status, numero)  # your query goes here
+        SQLcommand = "INSERT INTO Trabajadores (Nombre, Status, Horario, Numero) VALUES ('{}', {}, '{}', {});"\
+            .format(worker, status, horario, numero)  # your query goes here
+        print(SQLcommand)
         cur.execute(SQLcommand)
         con.commit()
 
