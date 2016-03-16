@@ -7,7 +7,6 @@ class QTableWidgetHelper:
         self.row = 0
         self.activeTable = None
 
-
     def append(self, item, column=0, color=None):
         if type(item) == list:
             for i in item:
@@ -36,5 +35,9 @@ class QTableWidgetHelper:
             content.append(row)
         return content
 
+    def resetTable(self):
+        print('reest')
+        self.activeTable.clearContents()
+        self.row = 0
 
 

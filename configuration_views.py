@@ -17,25 +17,24 @@ class Usuarios(QTableWidgetHelper,
         super(QTableWidgetHelper, self).__init__()
         self.setupUi(self)
         self.activeTable = self.tableWidget
-
         self.tableWidget.setColumnCount(4)
-        database = sql.Setup()
-
-        workerstable = database.getWorkersTable()
-        self.tableWidget.setRowCount(len(workerstable))
         self.workersinfo = {}
-        for i, w, s, h, n in workerstable:
-            self.workersinfo[n] = (i, w, s, h, n)
+
+        self.loadTable()
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.loadTable()
-
 
     def loadTable(self):
-        self.tableWidget.clearContents()
-        print(list(self.workersinfo.values()))
-        for i, w, s, h, n in list(self.workersinfo.values()):
+        self.resetTable()
+        database = sql.Setup()
+        workerstable = database.getWorkersTable()
+        self.tableWidget.setRowCount(len(workerstable))
+
+        for i, w, s, h, n in workerstable:
+            self.workersinfo[n] = (i, w, s, h, n)
             self.append([w, h, str(s), str(n)])
+
+
 
     @pyqtSlot()
     def on_botonGuardar_clicked(self):
@@ -43,7 +42,6 @@ class Usuarios(QTableWidgetHelper,
         table = self.workerstable
 
         for t in table:
-            print(t)
             database = sql.Setup()
             database.modifyWorker(*t)
 
@@ -51,12 +49,13 @@ class Usuarios(QTableWidgetHelper,
     def on_botonAgregar_clicked(self):
         interface = nt.Control(self)
         interface.show()
-        self.connect(interface, SIGNAL("Guardar()"), lambda: print('hola'))
-        return
-        nombre = interface.lineEditNombre.text()
-        horario = interface.comboBoxHorario.currentText()
-        activo = interface.checkBoxActivo.checkState()
-        numero = interface.lineEditNumero.text()
+        self.connect(interface, SIGNAL("Guardar(PyQt_PyObject)"), self.agregarTrabajador)
+
+    def agregarTrabajador(self, params):
+        nombre = params['nombre']
+        horario = params['horario']
+        activo = params['status']
+        numero = params['numero']
         for v in self.workersinfo.values():
             if numero in v:
                 print("El numero {} ya existe, por favor agregue otro".format(numero))

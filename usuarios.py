@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'usuarios.ui'
 #
-# Created: Fri Mar 11 21:44:17 2016
+# Created: Wed Mar 16 11:02:43 2016
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(404, 300)
+        Dialog.resize(489, 474)
         self.gridLayout = QtGui.QGridLayout(Dialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.tableWidget = QtGui.QTableWidget(Dialog)
@@ -42,19 +42,6 @@ class Ui_Dialog(object):
         item = QtGui.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(3, item)
         self.gridLayout.addWidget(self.tableWidget, 0, 0, 1, 1)
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem)
-        self.botonGuardar = QtGui.QPushButton(Dialog)
-        self.botonGuardar.setMinimumSize(QtCore.QSize(125, 25))
-        self.botonGuardar.setObjectName(_fromUtf8("botonGuardar"))
-        self.horizontalLayout.addWidget(self.botonGuardar)
-        self.botonCancelar = QtGui.QPushButton(Dialog)
-        self.botonCancelar.setMaximumSize(QtCore.QSize(100, 16777215))
-        self.botonCancelar.setObjectName(_fromUtf8("botonCancelar"))
-        self.horizontalLayout.addWidget(self.botonCancelar)
-        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.botonAgregar = QtGui.QPushButton(Dialog)
@@ -69,8 +56,8 @@ class Ui_Dialog(object):
         self.botonEliminar.setMaximumSize(QtCore.QSize(60, 16777215))
         self.botonEliminar.setObjectName(_fromUtf8("botonEliminar"))
         self.verticalLayout.addWidget(self.botonEliminar)
-        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem1)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem)
         self.gridLayout.addLayout(self.verticalLayout, 0, 1, 1, 1)
 
         self.retranslateUi(Dialog)
@@ -86,8 +73,6 @@ class Ui_Dialog(object):
         item.setText(_translate("Dialog", "Activo?", None))
         item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("Dialog", "Numero", None))
-        self.botonGuardar.setText(_translate("Dialog", "Guardar", None))
-        self.botonCancelar.setText(_translate("Dialog", "Cancelar", None))
         self.botonAgregar.setText(_translate("Dialog", "Agregar", None))
         self.botonModificar.setText(_translate("Dialog", "Modificar", None))
         self.botonEliminar.setText(_translate("Dialog", "Eliminar", None))
