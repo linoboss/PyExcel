@@ -129,7 +129,9 @@ class Setup:
 
         SQLcommand = "UPDATE Trabajadores SET Nombre='{}', Status={}, Horario='{}', Numero={} WHERE Id={};"\
             .format(nombre, status, horario, numero, id)
+        print(SQLcommand)
         cur.execute(SQLcommand)
+        con.commit()
 
 
     def getWorkerStatus(self):
@@ -173,6 +175,8 @@ class Setup:
                 personalShift[str(row[0])] = row[1]
         return personalShift
 
+    def remo
+
 
 if __name__ == "__main__":
     """
@@ -188,4 +192,6 @@ if __name__ == "__main__":
             setup.addWorker(w, jornada_personal[w], True)
     """
 
-    pprint(Setup().personalShift())
+    setup = Setup()
+    # id, nombre, status, horario, numero
+    #setup.modifyWorker(41, 'kekox', False, 'diurno', 555)

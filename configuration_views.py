@@ -6,6 +6,7 @@ from manejo_detablas import QTableWidgetHelper
 import sql
 from pprint import pprint
 import nuevo_trabajador_control as nt
+import sql
 
 
 class Usuarios(QTableWidgetHelper,
@@ -23,6 +24,7 @@ class Usuarios(QTableWidgetHelper,
         self.loadTable()
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        pprint(self.workersinfo)
 
     def loadTable(self):
         self.resetTable()
@@ -33,8 +35,6 @@ class Usuarios(QTableWidgetHelper,
         for i, w, s, h, n in workerstable:
             self.workersinfo[n] = (i, w, s, h, n)
             self.append([w, h, str(s), str(n)])
-
-
 
     @pyqtSlot()
     def on_botonGuardar_clicked(self):
@@ -47,31 +47,51 @@ class Usuarios(QTableWidgetHelper,
 
     @pyqtSlot()
     def on_botonAgregar_clicked(self):
-        interface = nt.Control(self)
+        interface = nt.AgregarTrabajador(self)
         interface.show()
         self.connect(interface, SIGNAL("Guardar(PyQt_PyObject)"), self.agregarTrabajador)
 
     def agregarTrabajador(self, params):
-        nombre = params['nombre']
-        horario = params['horario']
-        activo = params['status']
-        numero = params['numero']
-        for v in self.workersinfo.values():
-            if numero in v:
-                print("El numero {} ya existe, por favor agregue otro".format(numero))
-                QMessageBox().setText("El numero {} ya existe, por favor agregue otro".format(numero))
-                return
-        values = (nombre,
-                  horario,
-                  activo,
-                  numero)
-        self.workersinfo[numero] = values
+        self.errorCheck(params)
+        sql.Setup().addWorker(params['nombre'],
+                              params['status'],
+                              params['horario'],
+                              params['numero'])
         self.loadTable()
 
+    def remove(self):
+        selectedItems = self.tableWidget.selectedItems()
+        self.activeTable.removeRow(selectedItems)
 
     @pyqtSlot()
     def on_botonModificar_clicked(self):
-        print("Modificar")
+        selectedItems = self.tableWidget.selectedItems()
+        if not selectedItems:
+            print("Seleccione un trabajador")
+            return
+        selectedRow = [i.text() for i in selectedItems]
+        nombre = selectedRow[0]
+        horario = selectedRow[1]
+        status = selectedRow[2]
+        numero = selectedRow[3]
+        params = {'id': self.workersinfo[int(numero)][0],
+                  'nombre': nombre,
+                  'status': status,
+                  'numero': numero,
+                  'horario': horario}
+
+        interface = nt.ModificarTrabajador(self, params)
+        interface.show()
+        self.connect(interface, SIGNAL("Guardar(PyQt_PyObject)"), self.modificarTrabajador)
+
+    def modificarTrabajador(self, params):
+        self.errorCheck(params)
+        sql.Setup().modifyWorker(params['id'],
+                                 params['nombre'],
+                                 params['status'],
+                                 params['horario'],
+                                 params['numero'])
+        self.loadTable()
 
     @pyqtSlot()
     def on_botonEliminar_clicked(self):
@@ -81,6 +101,14 @@ class Usuarios(QTableWidgetHelper,
     def on_botonCancelar_clicked(self):
         self.close()
 
+    def errorCheck(self, params):
+        numero = params['numero']
+        for v in self.workersinfo.values():
+            if int(numero) == int(v[4]):
+                if int(params['id']) != v[0]:
+                    print("El numero {} ya existe, por favor agregue otro".format(numero))
+                    QMessageBox().setText("El numero {} ya existe, por favor agregue otro".format(numero))
+                    raise ValueError
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
