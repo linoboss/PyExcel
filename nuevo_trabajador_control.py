@@ -79,6 +79,7 @@ class ModificarTrabajador(QDialog,
         self.params['numero'] = self.lineEditNumero.text()
 
         self.emit(SIGNAL('Guardar(PyQt_PyObject)'), self.params)
+        self.close()
 
     @pyqtSlot()
     def on_botonCancelar_clicked(self):

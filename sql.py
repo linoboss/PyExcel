@@ -92,90 +92,89 @@ class SQL:
 class Setup:
     def __init__(self):
         # set up some constants
-        pass
+        self.database_address = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'
+
+        MDB = self.database_address; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
+        self.con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
+        self.cur = self.con.cursor()
 
     def addWorker(self, worker, status, horario, numero):
-        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-
-        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        cur = con.cursor()
-
         SQLcommand = "INSERT INTO Trabajadores (Nombre, Status, Horario, Numero) VALUES ('{}', {}, '{}', {});"\
             .format(worker, status, horario, numero)  # your query goes here
-        print(SQLcommand)
-        cur.execute(SQLcommand)
-        con.commit()
+        self.cur.execute(SQLcommand)
+        self.con.commit()
+        self.cur.close()
+        self.con.close()
 
     def getWorkerID(self):
-        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-
-        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        cur = con.cursor()
-
         SQLcommand = "SELECT ID, Nombre FROM Trabajadores" # your query goes here
-        workerstatus_table = cur.execute(SQLcommand)
+        workerstatus_table = self.cur.execute(SQLcommand)
         rows = workerstatus_table.fetchall()
 
         workerId = {}
         for row in rows:
             workerId[str(row[1])] = row[0]
+        self.cur.close()
+        self.con.close()
         return workerId
 
     def modifyWorker(self, id, nombre, status, horario, numero):
-        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-
-        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        cur = con.cursor()
-
         SQLcommand = "UPDATE Trabajadores SET Nombre='{}', Status={}, Horario='{}', Numero={} WHERE Id={};"\
             .format(nombre, status, horario, numero, id)
-        print(SQLcommand)
-        cur.execute(SQLcommand)
-        con.commit()
-
+        self.cur.execute(SQLcommand)
+        self.con.commit()
 
     def getWorkerStatus(self):
-        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-
-        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        cur = con.cursor()
-
         SQLcommand = "SELECT * FROM Trabajadores" # your query goes here
-        workerstatus_table = cur.execute(SQLcommand)
+        workerstatus_table = self.cur.execute(SQLcommand)
         rows = workerstatus_table.fetchall()
 
         workerstatus = {}
         for row in rows:
             workerstatus[str(row[1])] = row[3]
+
+        self.cur.close()
+        self.con.close()
         return workerstatus
 
     def getWorkersTable(self):
-        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-
-        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        cur = con.cursor()
-
         SQLcommand = "SELECT * FROM Trabajadores" # your query goes here
-        workerstatus_table = cur.execute(SQLcommand)
-        return workerstatus_table.fetchall()
+        workerstatus_table = self.cur.execute(SQLcommand)
+        workerstatus = workerstatus_table.fetchall()
+        self.cur.close()
+        self.con.close()
+        return workerstatus
 
     def personalShift(self):
-        MDB = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-
-        con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        cur = con.cursor()
-
         SQLcommand = "SELECT Nombre, Horario, Status FROM Trabajadores" # your query goes here
-        workerstatus_table = cur.execute(SQLcommand)
+        workerstatus_table = self.cur.execute(SQLcommand)
         rows = workerstatus_table.fetchall()
 
         personalShift = {}
         for row in rows:
             if row[2]:
                 personalShift[str(row[0])] = row[1]
+
+        self.cur.close()
+        self.con.close()
         return personalShift
 
-    def remo
+    def removeWorkers(self, numbers):
+        result = ""
+        length = len(numbers)
+        if isinstance(numbers, list):
+            for i in range(length):
+                num = numbers[i]
+                if i != length - 1:
+                    result += "Numero=" + str(num) + " OR "
+                else:
+                    result += "Numero=" + str(num) + ';'
+        SQLcommand = 'DELETE FROM Trabajadores WHERE {}'.format(result)
+        print(SQLcommand)
+        self.cur.execute(SQLcommand)
+        self.con.commit()
+        self.cur.close()
+        self.con.close()
 
 
 if __name__ == "__main__":

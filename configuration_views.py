@@ -3,7 +3,6 @@ import usuarios
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, pyqtSlot, SIGNAL
 from manejo_detablas import QTableWidgetHelper
-import sql
 from pprint import pprint
 import nuevo_trabajador_control as nt
 import sql
@@ -95,11 +94,17 @@ class Usuarios(QTableWidgetHelper,
 
     @pyqtSlot()
     def on_botonEliminar_clicked(self):
-        print("eliminar")
-
-
-    def on_botonCancelar_clicked(self):
-        self.close()
+        col_num = 4
+        selectedItems = [i.text() for i in self.tableWidget.selectedItems()]
+        converted = []
+        index = 0
+        for i in range(len(selectedItems)):
+            index += 1
+            if index % 4 == 0:
+                converted.append(selectedItems[i])
+                index = 0
+        sql.Setup().removeWorkers(converted)
+        self.loadTable()
 
     def errorCheck(self, params):
         numero = params['numero']
