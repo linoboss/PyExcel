@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'nuevo_trabajador.ui'
 #
-# Created: Fri Mar 11 22:23:36 2016
+# Created: Thu Mar 17 18:49:29 2016
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!

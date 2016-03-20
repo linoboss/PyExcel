@@ -134,19 +134,26 @@ class Table(QWidget, Ui_Form):
                     schedule = workday_info[worker]
                     # print(worker, schedule)
                     h = schedule['horario']
+                    tt = schedule['tiempo trabajado']
+                    tt = tt if tt != '00 : 00' else ''
+                    te = schedule['tiempo extra']
+                    te = te if te != '00 : 00' else ''
+                    ta = schedule['tiempo ausente']
+                    ta = ta if ta != '00 : 00' else ''
                     if horario == 'diurno':
+
                         line_to_QTable = [schedule['nombre'],
                                           h['matutino']['entrada'], h['matutino']['salida'],
                                           h['vespertino']['entrada'], h['vespertino']['salida'],
-                                          schedule['tiempo trabajado'],
-                                          schedule['tiempo extra'],
-                                          schedule['tiempo ausente']]
+                                          tt,
+                                          te,
+                                          ta]
                     else:
                         line_to_QTable = [schedule['nombre'],
                                           h['nocturno']['entrada'], h['nocturno']['salida'],
-                                          schedule['tiempo trabajado'],
-                                          schedule['tiempo extra'],
-                                          schedule['tiempo ausente']]
+                                          tt,
+                                          te,
+                                          ta]
 
                     self.append(line_to_QTable)
                     #self.paintHorary(self.__row - 1, h)

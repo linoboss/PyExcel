@@ -240,7 +240,7 @@ class WorkersPerformance:
         workable_days: dict.keys = ('diurno', 'nocturno')
         """
         self.workable_time['diurno'] = workable_days['diurno'] * datetime.timedelta(hours=8)
-        self.workable_time['nocturno'] = workable_days['nocturno'] * datetime.timedelta(hours=8)
+        self.workable_time['nocturno'] = workable_days['nocturno'] * datetime.timedelta(hours=11)
 
     def __str__(self):
         r = {}

@@ -8,13 +8,15 @@ import nuevo_trabajador_control as nt
 import sql
 
 
-class Usuarios(QTableWidgetHelper,
-               QDialog,
-               usuarios.Ui_Dialog
-               ):
-    def __init__(self):
-        super(Usuarios, self).__init__()
+class PersonalSetup(QTableWidgetHelper,
+                    QDialog,
+                    usuarios.Ui_Dialog
+                    ):
+    def __init__(self, parent=None):
+        super(PersonalSetup, self).__init__()
         super(QTableWidgetHelper, self).__init__()
+        super(QDialog, self).__init__(parent)
+
         self.setupUi(self)
         self.activeTable = self.tableWidget
         self.tableWidget.setColumnCount(4)
@@ -35,14 +37,6 @@ class Usuarios(QTableWidgetHelper,
             self.workersinfo[n] = (i, w, s, h, n)
             self.append([w, h, str(s), str(n)])
 
-    @pyqtSlot()
-    def on_botonGuardar_clicked(self):
-        pprint(self.getTableContent())
-        table = self.workerstable
-
-        for t in table:
-            database = sql.Setup()
-            database.modifyWorker(*t)
 
     @pyqtSlot()
     def on_botonAgregar_clicked(self):
@@ -100,7 +94,7 @@ class Usuarios(QTableWidgetHelper,
         index = 0
         for i in range(len(selectedItems)):
             index += 1
-            if index % 4 == 0:
+            if index % col_num == 0:
                 converted.append(selectedItems[i])
                 index = 0
         sql.Setup().removeWorkers(converted)
@@ -115,9 +109,10 @@ class Usuarios(QTableWidgetHelper,
                     QMessageBox().setText("El numero {} ya existe, por favor agregue otro".format(numero))
                     raise ValueError
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    users = Usuarios()
+    users = PersonalSetup()
     users.show()
     app.exec()
 

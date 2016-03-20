@@ -35,9 +35,6 @@ class QTableWidgetHelper:
             content.append(row)
         return content
 
-    def getSelectedContent(self):
-        self.activeTable.se
-
     def resetTable(self):
         self.activeTable.clearContents()
         self.row = 0

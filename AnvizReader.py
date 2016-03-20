@@ -188,7 +188,6 @@ class Reorganizar:
             for w in self.personal:
                 w_info = workday.workers[w]
                 h = w_info['horario'].content
-
                 zero_time = datetime.timedelta(hours=0)
                 worked_time = zero_time
 
@@ -203,9 +202,9 @@ class Reorganizar:
                             v_out = None
                         else:
                             v_out = next_workday.workers[w]['horario'].content['nocturno']['salida']
-
                     if v_out != None and v_in != None:
                         worked_time += v_out - v_in
+                    else: continue
 
                 #Dependiendo de la jornada del trabajador, las horas laborables del dia pueden variar
                 work_time_reference = workday.workableHours[jornada_personal[w]]

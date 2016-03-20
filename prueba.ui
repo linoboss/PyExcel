@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>90</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,34 +40,6 @@
    </property>
    <property name="displayFormat">
     <string>dd/MM/yyyy</string>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="dateTimeEdit_2">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>50</y>
-     <width>194</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>100</y>
-     <width>341</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>48</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>hola febri :)</string>
    </property>
   </widget>
  </widget>

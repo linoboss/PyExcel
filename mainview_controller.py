@@ -1,10 +1,11 @@
 __author__ = 'Sonidos Guayana'
 import sys
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QObject, pyqtSlot
+from PyQt4.QtCore import QObject, pyqtSlot, SIGNAL
 import AnvizReader
 import GUI, tabla, controles_tabla
 from to_excel import ToExcel
+from configuration_views import PersonalSetup
 
 
 class Controles(QWidget,
@@ -60,6 +61,12 @@ class MainViewController(QMainWindow,
         self.controls = Controles(self)
         self.gridLayout.addWidget(self.tables, 0, 0)
         self.gridLayout.addWidget(self.controls, 0, 1)
+        self.actionPersonal.triggered.connect(self.personalSetup)
+
+    def personalSetup(self):
+        ps = PersonalSetup()
+        ps.exec_()
+
 
 
 if __name__ == "__main__":

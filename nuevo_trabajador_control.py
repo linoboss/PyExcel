@@ -88,7 +88,12 @@ class ModificarTrabajador(QDialog,
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    users = ModificarTrabajador()
+    parametros = {'numero': '1',
+                  'id': '1',
+                  'status': 'True',
+                  'nombre': 'keko',
+                  'horario': 'diurno'}
+    users = ModificarTrabajador(params=parametros)
     users.show()
     QObject.connect(users, SIGNAL("Guardar(PyQt_PyObject)"), lambda x: print(x))
     app.exec()
