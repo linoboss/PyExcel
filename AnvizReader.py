@@ -10,7 +10,7 @@ from diasnolaborables import DiasNoLaborables
 
 schedules = ['Vespertino', 'Matutino', 'nocturno']
 work_time_reference = datetime.timedelta(hours=8)
-jornada_personal = Setup().personalShift()
+
 
 schedules_regular_workdays = {'diurno': ('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'),
                               'nocturno': ('Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado')}
@@ -30,8 +30,9 @@ class Reorganizar:
         database = SQL()
         database.loadChekInOutTable()
 
+        self.jornada_personal = Setup().personalShift()
         self.matriz = database.data_matrix
-        self.personal = sorted(jornada_personal.keys())
+        self.personal = sorted(self.jornada_personal.keys())
         dates = database.dates
         self.dates = [d for d in dates if d > datetime.date(2014, 1, 1)]
         self.start_date = self.dates[0]
@@ -58,7 +59,7 @@ class Reorganizar:
             # Los checks mal hechos o fuera de los parametros aceptados
             # pasan a una lista para ser verificados
             try:
-                jornada = jornada_personal[worker]
+                jornada = self.jornada_personal[worker]
             except KeyError:
                 if worker not in workers_not_found:
                     workers_not_found.append(worker)
@@ -115,7 +116,7 @@ class Reorganizar:
 
         for worker in self.personal:
             # transformar a [worker, time_segment, entry_time, exit_time]
-            worker_schedule = jornada_personal[worker]
+            worker_schedule = self.jornada_personal[worker]
 
             if worker_schedule == "diurno":
                 w = {"worker": worker, "matutino": {"entrada": None, "salida": None},
@@ -207,7 +208,7 @@ class Reorganizar:
                     else: continue
 
                 #Dependiendo de la jornada del trabajador, las horas laborables del dia pueden variar
-                work_time_reference = workday.workableHours[jornada_personal[w]]
+                work_time_reference = workday.workableHours[self.jornada_personal[w]]
 
                 # si no hay tiempo extra, el resultado será zero. Es decir, no habrán resultados negativos
                 if worked_time > work_time_reference:
@@ -221,6 +222,7 @@ class Reorganizar:
                     absent_time = datetime.timedelta(hours=0)
 
                 workday.addPerformance(w, worked_time, extra_time, absent_time)
+                print(w, worked_time, extra_time, absent_time)
             content[i] = workday
 
     def row(self, n):

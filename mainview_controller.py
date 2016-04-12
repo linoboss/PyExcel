@@ -21,6 +21,8 @@ class Controles(QWidget,
         self.qdateFrom.setDate(first_date)
         self.qdateTo.setDate(last_date)
 
+        self.reporte = None
+
     @pyqtSlot()
     def on_qbuttonGenerar_clicked(self, **kwargs):
         self.reporte = self.getDatosLector()
@@ -50,6 +52,12 @@ class Controles(QWidget,
         datoslector.calculateWorkedTime()
         return datoslector
 
+    def __restoreDBADD(self):
+        import shelve, os
+        d = os.getcwd() + '\\Att2003.mdb'
+        a = shelve.open('config')
+        a['dbadd'] = d
+        a.close()
 
 class MainViewController(QMainWindow,
                          GUI.Ui_MainWindow):
@@ -62,11 +70,35 @@ class MainViewController(QMainWindow,
         self.gridLayout.addWidget(self.tables, 0, 0)
         self.gridLayout.addWidget(self.controls, 0, 1)
         self.actionPersonal.triggered.connect(self.personalSetup)
+        self.actionBase_de_datos.triggered.connect(self.addressDataBase)
 
     def personalSetup(self):
         ps = PersonalSetup()
         ps.exec_()
 
+    def addressDataBase(self):
+        import tkinter
+        from tkinter import filedialog
+        import shelve
+        tk = tkinter.Tk()
+        tk.withdraw()
+        filename = filedialog.askopenfile(parent=tk, mode='r', defaultextension='*.mdb', filetypes=[('Microsoft Access Driver', '*.mdb')])
+        tk.destroy()
+        if not filename: return
+        filename = filename.name.replace('/', '\\')
+
+        try:
+            from sql import SQL
+            sql = SQL()
+            sql.close()
+        except:
+            print('Direccion invalida.', filename)
+            return
+        print(filename)
+
+        shelve_ = shelve.open('config')
+        shelve_['dbadd'] = filename
+        shelve_.close()
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ class Table(QWidget, Ui_Form):
         self.tablesContent = {'logs': [], 'rango': []}
 
     def append(self, item, column=0, color=None):
-
+        print(item)
         if type(item) == list:
             for i in item:
                 newItem = QTableWidgetItem(i)
@@ -206,7 +206,7 @@ class Table(QWidget, Ui_Form):
         # Cargar tabla de dias
         self.activeTable = self.table_logs
         self.__workdays = list(self.reporte.content)
-        day_table_length = len(self.__workdays) * (2 + len(header) + len(self.reporte.personal))
+        day_table_length = len(self.__workdays) * (4 + len(header) + len(self.reporte.personal))
         self.table_logs.setRowCount(day_table_length)
         while self.__workdays: self.workDays()
 

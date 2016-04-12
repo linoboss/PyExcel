@@ -10,6 +10,7 @@ class ToExcel():
         self._i = 1
 
     def append(self, item, column='A', color=None):
+        print(item)
         if type(item) == list:
             if type(item[0]) == list:
                 index_increment = len(item)

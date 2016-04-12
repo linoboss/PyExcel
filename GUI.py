@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GUI.ui'
 #
-# Created: Tue Feb 16 08:56:20 2016
+# Created: Sun Mar 20 23:32:19 2016
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -33,7 +33,7 @@ class Ui_MainWindow(object):
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 18))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuMenu = QtGui.QMenu(self.menubar)
         self.menuMenu.setObjectName(_fromUtf8("menuMenu"))
@@ -45,8 +45,11 @@ class Ui_MainWindow(object):
         self.actionPersonal.setObjectName(_fromUtf8("actionPersonal"))
         self.actionHorarios = QtGui.QAction(MainWindow)
         self.actionHorarios.setObjectName(_fromUtf8("actionHorarios"))
+        self.actionBase_de_datos = QtGui.QAction(MainWindow)
+        self.actionBase_de_datos.setObjectName(_fromUtf8("actionBase_de_datos"))
         self.menuMenu.addAction(self.actionPersonal)
         self.menuMenu.addAction(self.actionHorarios)
+        self.menuMenu.addAction(self.actionBase_de_datos)
         self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -57,4 +60,5 @@ class Ui_MainWindow(object):
         self.menuMenu.setTitle(_translate("MainWindow", "Menu", None))
         self.actionPersonal.setText(_translate("MainWindow", "Personal", None))
         self.actionHorarios.setText(_translate("MainWindow", "Horarios", None))
+        self.actionBase_de_datos.setText(_translate("MainWindow", "Base de datos", None))
 

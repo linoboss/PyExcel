@@ -1,15 +1,18 @@
 # https://code.google.com/p/pyodbc/wiki/Cursor
 
 import pyodbc
-from pprint import pprint
 from datetime import datetime, date
 from pprint import pprint
+import shelve
 
 
 class SQL:
     def __init__(self):
         # set up some constants
-        MDB = 'Att2003.mdb'; DRV = '{Microsoft Access Driver (*.mdb)}'; PWD = 'pw'
+        shelve_ = shelve.open('config', flag='rw', protocol=None, writeback=False)
+        dbadd = shelve_['dbadd']
+        shelve_.close()
+        MDB = dbadd; DRV = '{Microsoft Access Driver (*.mdb)}'; PWD = 'pw'
 
         # connect to db
         self.con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
@@ -51,8 +54,7 @@ class SQL:
         checkinout_table = self.cur.execute(SQLcommand)
         dates = checkinout_table.fetchall()
         dates = [d[0] for d in dates]
-        self.cur.close()
-        self.con.close()
+        self.close()
         self.personal = personal_ids.values()
         self.data_matrix = result
         self.headers = columns
@@ -78,8 +80,7 @@ class SQL:
         schedule_table = self.cur.execute(SQLcommand)
         schedule = dict([(tab[0], tab[1]) for tab in schedule_table.fetchall()])
 
-        self.cur.close()
-        self.con.close()
+        self.close()
 
         for k, v in personalID.items():
             try:
@@ -88,11 +89,17 @@ class SQL:
                 pass
         return personalShift
 
+    def close(self):
+        self.cur.close()
+        self.con.close()
+
 
 class Setup:
     def __init__(self):
         # set up some constants
-        self.database_address = r'C:\Users\Keko\Documents\PyExcel\Setup.accdb'
+        import os
+
+        self.database_address = os.getcwd() + '\\Setup.accdb'
 
         MDB = self.database_address; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
         self.con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
@@ -103,8 +110,7 @@ class Setup:
             .format(worker, status, horario, numero)  # your query goes here
         self.cur.execute(SQLcommand)
         self.con.commit()
-        self.cur.close()
-        self.con.close()
+        self.close()
 
     def getWorkerID(self):
         SQLcommand = "SELECT ID, Nombre FROM Trabajadores" # your query goes here
@@ -114,8 +120,7 @@ class Setup:
         workerId = {}
         for row in rows:
             workerId[str(row[1])] = row[0]
-        self.cur.close()
-        self.con.close()
+        self.close()
         return workerId
 
     def modifyWorker(self, id, nombre, status, horario, numero):
@@ -133,16 +138,14 @@ class Setup:
         for row in rows:
             workerstatus[str(row[1])] = row[3]
 
-        self.cur.close()
-        self.con.close()
+        self.close()
         return workerstatus
 
     def getWorkersTable(self):
         SQLcommand = "SELECT * FROM Trabajadores" # your query goes here
         workerstatus_table = self.cur.execute(SQLcommand)
         workerstatus = workerstatus_table.fetchall()
-        self.cur.close()
-        self.con.close()
+        self.close()
         return workerstatus
 
     def personalShift(self):
@@ -155,8 +158,7 @@ class Setup:
             if row[2]:
                 personalShift[str(row[0])] = row[1]
 
-        self.cur.close()
-        self.con.close()
+        self.close()
         return personalShift
 
     def removeWorkers(self, numbers):
@@ -173,6 +175,9 @@ class Setup:
         print(SQLcommand)
         self.cur.execute(SQLcommand)
         self.con.commit()
+        self.close()
+
+    def close(self):
         self.cur.close()
         self.con.close()
 
