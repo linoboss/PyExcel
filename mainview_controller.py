@@ -2,10 +2,10 @@ __author__ = 'Sonidos Guayana'
 import sys
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, pyqtSlot, SIGNAL
-import AnvizReader
-import GUI, tabla, controles_tabla
-from to_excel import ToExcel
-from configuration_views import PersonalSetup
+from assets import AnvizReader
+from ui import GUI, tabla, controles_tabla
+from assets.to_excel import ToExcel
+from ui.configuration_views import PersonalSetup
 
 
 class Controles(QWidget,
@@ -59,12 +59,13 @@ class Controles(QWidget,
         a['dbadd'] = d
         a.close()
 
+
 class MainViewController(QMainWindow,
                          GUI.Ui_MainWindow):
     def __init__(self, parent=None):
+        #cargando la interfaz
         super(MainViewController, self).__init__(parent)
         self.setupUi(self)
-
         self.tables = tabla.Table()
         self.controls = Controles(self)
         self.gridLayout.addWidget(self.tables, 0, 0)
@@ -88,7 +89,7 @@ class MainViewController(QMainWindow,
         filename = filename.name.replace('/', '\\')
 
         try:
-            from sql import SQL
+            from persistence.sql import SQL
             sql = SQL()
             sql.close()
         except:
@@ -105,6 +106,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     mainview_controller = MainViewController()
     mainview_controller.show()
+
     app.exec()
 
 
