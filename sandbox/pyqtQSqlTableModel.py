@@ -35,8 +35,10 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
 
         self.model.sort(B, Qt.AscendingOrder)
         self.model.select()
+        from PyQt4.QtGui import QSortFilterProxyModel
+        self.proxymodel = QSortFilterProxyModel()
         # self.tableView = QTableView() #elimina
-        self.tableView.setModel(self.model)
+        self.tableView.setModel(self.proxymodel)
 
         self.mapper = QDataWidgetMapper(self)
         self.mapper.setSubmitPolicy(QDataWidgetMapper.AutoSubmit)

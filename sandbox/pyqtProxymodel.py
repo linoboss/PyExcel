@@ -1,9 +1,8 @@
 import sys
 from PyQt4 import uic
-from PyQt4.QtCore import Qt, QDateTime, QDate, QVariant, SIGNAL
-from PyQt4.QtSql import QSqlQuery, QSqlTableModel, QSqlDatabase
-from PyQt4.QtGui import QTableView, QMessageBox, QApplication, QDialog,\
-    QDataWidgetMapper, QAbstractItemView
+from PyQt4 import QtSql, QtCore, QtGui
+from PyQt4.QtSql import QSqlDatabase
+from PyQt4.QtCore import SIGNAL, Qt, pyqtSlot
 import datetime as dt
 
 
@@ -24,10 +23,10 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
 
         db.setDatabaseName("DRIVER={};DBQ={};PWD={}".format(DRV, MDB, PWD))
         if not db.open():
-            QMessageBox.warning(None, "Error", "Database Error: {}".format(db.lastError().text()))
+            QtGui.QMessageBox.warning(None, "Error", "Database Error: {}".format(db.lastError().text()))
             sys.exit(1)
 
-        self.model = QSqlTableModel(self)
+        self.model = QtSql.QSqlTableModel(self)
         self.model.setTable('Checkinout')
 
         # Headings indexes
@@ -38,21 +37,20 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
 
         #self.tableView = QTableView()
         self.tableView.setModel(self.model)
-        self.tableView.setSelectionMode(QTableView.SingleSelection)
-        self.tableView.setSelectionBehavior(QTableView.SelectRows)
+        self.tableView.setSelectionMode(QtGui.QTableView.SingleSelection)
+        self.tableView.setSelectionBehavior(QtGui.QTableView.SelectRows)
         for column in [4, 5, 6, 7]: self.tableView.setColumnHidden(column, True)
         self.tableView.resizeColumnsToContents()
         self.tableView.setSortingEnabled(True)
-        self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableView.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
-        self.mapper = QDataWidgetMapper(self)
-        self.mapper.setSubmitPolicy(QDataWidgetMapper.AutoSubmit)
+        self.mapper = QtGui.QDataWidgetMapper(self)
+        self.mapper.setSubmitPolicy(QtGui.QDataWidgetMapper.AutoSubmit)
         self.mapper.setModel(self.model)
         self.mapper.addMapping(self.a, A)
         self.mapper.addMapping(self.b, B)
         self.mapper.addMapping(self.c, C)
         self.mapper.addMapping(self.id, ID)
-        self.mapper.toFirst()
 
         self.connect(self.btn_save, SIGNAL("clicked()"),
                      self.saveRecord)
@@ -60,11 +58,14 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
     def saveRecord(self):
         self.model.submitAll()
 
-
+    @pyqtSlot()
+    def on_model_selectionChanged(self, index):
+        print(index)
+        self.mapper.setCurrentModelIndex(index)
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QtGui.QApplication(sys.argv)
     window = LearningSqlModel()
     window.show()
     sys.exit(app.exec())
