@@ -1,15 +1,15 @@
 __author__ = 'Lino Bossio'
 
-import datetime
-import ciclos
-from performance import Workday, WorkersPerformance
-from sql import SQL, Setup
-from horarios import HorarioDiurno, HorarioNocturno
-from dates_tricks import MyDates
-from diasnolaborables import DiasNoLaborables
+from assets import ciclos
+from assets.performance import Workday, WorkersPerformance
+from assets.sql import SQL, Setup
+from assets.horarios import HorarioDiurno, HorarioNocturno
+from assets.dates_tricks import MyDates
+from assets.diasnolaborables import DiasNoLaborables
+import datetime as dt
 
 schedules = ['Vespertino', 'Matutino', 'nocturno']
-work_time_reference = datetime.timedelta(hours=8)
+work_time_reference = dt.timedelta(hours=8)
 
 
 schedules_regular_workdays = {'diurno': ('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'),
@@ -31,10 +31,11 @@ class Reorganizar:
         database.loadChekInOutTable()
 
         self.jornada_personal = Setup().personalShift()
+        print(self.jornada_personal)
         self.matriz = database.data_matrix
         self.personal = sorted(self.jornada_personal.keys())
         dates = database.dates
-        self.dates = [d for d in dates if d > datetime.date(2014, 1, 1)]
+        self.dates = [d for d in dates if d > dt.date(2014, 1, 1)]
         self.start_date = self.dates[0]
         self.stop_date = self.dates[-1]
         self.exceptions = None
@@ -44,7 +45,6 @@ class Reorganizar:
         self.content = ()
         self.thisday = DiasNoLaborables()
         self.organizar_por_fecha()
-
 
     def validateCheck(self):
         matrix = []
@@ -153,8 +153,7 @@ class Reorganizar:
                             w["nocturno"]["entrada"] = checktime
                         elif in_out == "O":
                             w["nocturno"]["salida"] = checktime
-                workday.load_horary(
-                        w["worker"], "nocturno", w["nocturno"]["entrada"], w["nocturno"]["salida"])
+                workday.load_horary(w["worker"], "nocturno", w["nocturno"]["entrada"], w["nocturno"]["salida"])
 
             else:
                 print("Este tipo de horario no existe aun")
@@ -189,7 +188,7 @@ class Reorganizar:
             for w in self.personal:
                 w_info = workday.workers[w]
                 h = w_info['horario'].content
-                zero_time = datetime.timedelta(hours=0)
+                zero_time = dt.timedelta(hours=0)
                 worked_time = zero_time
 
                 for k, v in h.items():
@@ -214,12 +213,12 @@ class Reorganizar:
                 if worked_time > work_time_reference:
                     extra_time = worked_time - work_time_reference
                 else:
-                    extra_time = datetime.timedelta(hours=0)
+                    extra_time = dt.timedelta(hours=0)
                 # si no hay tiempo ausente, el resultado será zero. Igual que para el tiempo extra
                 if worked_time < work_time_reference:
                     absent_time = work_time_reference - worked_time
                 else:
-                    absent_time = datetime.timedelta(hours=0)
+                    absent_time = dt.timedelta(hours=0)
 
                 workday.addPerformance(w, worked_time, extra_time, absent_time)
                 print(w, worked_time, extra_time, absent_time)
@@ -353,6 +352,6 @@ if __name__ == "__main__":
     reporte = Reorganizar()
     reporte.organizar_por_fecha()
     reporte.calculateWorkedTime()
-    reporte.filter(datetime.date(2015,1,1), datetime.date(2015,5,5))
+    reporte.filter(dt.date(2015,1,1), dt.date(2015,5,5))
     totalize = TotalizeByRange(reporte)
     print(totalize.byRange)

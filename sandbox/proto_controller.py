@@ -34,56 +34,14 @@ class ProtoController(Ui_MainWindow, QtBaseClass):
         self.proxymodel.setDynamicSortFilter(True)
         self.proxymodel.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
-        # self.tableView = QTableView()
-        self.logs_table.setModel(self.proxymodel)
-        self.logs_table.setSelectionMode(QtGui.QTableView.SingleSelection)
-        self.logs_table.setSelectionBehavior(QtGui.QTableView.SelectRows)
-        for column in [4, 5, 6, 7]: self.logs_table.setColumnHidden(column, True)
-        self.logs_table.resizeColumnsToContents()
-        self.logs_table.setSortingEnabled(True)
-        self.logs_table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-
         query = QtSql.QSqlQuery()
         query.exec("SELECT Userid, Name FROM Userinfo WHERE isActive")
 
-        print(query.isActive(), query.lastError().text())
         while query.next():
-            #self.worker_filter = QtGui.QComboBox()
-            print(query.value(1))
+            # self.worker_filter = QtGui.QComboBox()
             self.worker_filter.addItem(query.value(1))
 
-
-        """
-        self.mapper = QDataWidgetMapper(self)
-        self.mapper.setSubmitPolicy(QDataWidgetMapper.AutoSubmit)
-        self.mapper.setModel(self.model)
-        self.mapper.addMapping(self.a, A)
-        self.mapper.addMapping(self.b, B)
-        self.mapper.addMapping(self.c, C)
-        self.mapper.addMapping(self.id, ID)
-        self.mapper.toFirst()
-        """
-
-        """
-        from PyQt4.QtGui import QComboBox
-        self.date_filter = QComboBox()
-        """
         self.date_filter.addItems(["(Noris)", ".*", "[1]+"])
-
-    @pyqtSlot("QString")
-    def on_date_filter_activated(self, a):
-        self.proxymodel.setFilterKeyColumn(1)
-        self.proxymodel.setFilterRegExp(a)
-
-    @pyqtSlot("QString")
-    def on_schedulefilter_activated(self, a):
-        self.proxymodel.setFilterKeyColumn(1)
-        self.proxymodel.setFilterRegExp(a)
-
-    @pyqtSlot("QString")
-    def on_worker_filter_activated(self, a):
-        self.proxymodel.setFilterKeyColumn(1)
-        self.proxymodel.setFilterRegExp(a)
 
     @pyqtSlot("QDate")
     def on_calendarWidget_clicked(self, d):

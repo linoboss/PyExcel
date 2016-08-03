@@ -1,16 +1,16 @@
 import itertools
 import datetime
 from copy import deepcopy
-from dates_tricks import MyDates
-from sql import Setup
-
+from assets.dates_tricks import MyDates
+from assets.sql import Setup
+"""
 schedules = ['Vespertino', 'Matutino', 'nocturno']
 work_time_reference = datetime.timedelta(hours=8)
 jornada_personal = Setup().personalShift()
 
 schedules_regular_workdays = {'diurno': ('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'),
                               'nocturno': ('Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado')}
-
+"""
 
 def isworkable(date, jornada):
     print(date)

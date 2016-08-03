@@ -26,6 +26,8 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
             QtGui.QMessageBox.warning(None, "Error", "Database Error: {}".format(db.lastError().text()))
             sys.exit(1)
 
+        self.progressBar.setValue(1)
+
         self.model = QtSql.QSqlTableModel(self)
         self.model.setTable('Checkinout')
 
@@ -35,13 +37,13 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
         self.model.sort(B, Qt.AscendingOrder)
         self.model.select()
 
-        self.proxymodel = QtGui.QSortFilterProxyModel(self)
+        self.proxymodel = MyProxyModel(self)
         self.proxymodel.setSourceModel(self.model)
         self.proxymodel.sort(1, Qt.AscendingOrder)
         self.proxymodel.setDynamicSortFilter(True)
         self.proxymodel.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
-        # self.tableView = QTableView()
+        #self.tableView = QTableView()
         self.tableView.setModel(self.proxymodel)
         self.tableView.setSelectionMode(QtGui.QTableView.SingleSelection)
         self.tableView.setSelectionBehavior(QtGui.QTableView.SelectRows)
@@ -64,14 +66,59 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
             # self.workersList = QtGui.QComboBox()
             self.workersList.addItem(query.value(0))
 
+
+
+        #QtCore.QModelIndex().internalPointer()
+
     @pyqtSlot("QModelIndex")
     def on_tableView_clicked(self, index):
         self.mapper.setCurrentIndex(index.row())
+        """ FILTROS
+            Aceptan o rechazan filas retornando True or False."""
 
-    @pyqtSlot("QString")
-    def on_workersList_activated(self, worker):
-        self.proxymodel.setFilterKeyColumn(1)
-        self.proxymodel.setFilterRegExp("^{}$".format(worker))
+        self.proxymodel.addFilterFunction(
+            "id",
+            lambda r: 2 < int(self.model.record(r).value(1)) < 15
+        )
+        self.d_from = QtCore.QDateTime(dt.datetime(2015, 1, 1))
+        self.d_to = QtCore.QDateTime(dt.datetime(2015, 4, 1))
+
+        self.proxymodel.addFilterFunction(
+            "CheckTime",
+            lambda r:
+            self.d_from <
+            self.model.record(r).value(2) <
+            self.d_to
+        )
+
+
+class MyProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.filterFunctions = {}
+        self.i = 0
+        # self.progressBar = QtGui.QProgressBar()
+        self.progressBar = parent.progressBar
+        self.progressBar.setMinimum(0)
+
+    def addFilterFunction(self, name, new_func):
+        self.filterFunctions[name] = new_func
+        self.invalidateFilter()
+
+    def filterAcceptsRow(self, row, parent):
+        """
+        Reimplemented from base class
+        Executes a set of tests from the filterFunctions, if any fails, the row is rejected
+        """
+        # tests = [func(QModelIndex.row()) for func in self.filterFunctions.values()]
+
+        tests = []
+        self.progressBar.setValue(row)
+        for k, func in self.filterFunctions.items():
+            tests.append(func(row))
+
+        return False not in tests
 
 
 if __name__ == "__main__":
