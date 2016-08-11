@@ -75,6 +75,10 @@ class MyDates:
             d += relativedelta(days=1)
         return dates_range_
 
+    @staticmethod
+    def next_day(d):
+        return d + relativedelta(days=1)
+
 # **TESTS**
 
 

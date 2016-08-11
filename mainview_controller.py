@@ -1,113 +1,133 @@
-__author__ = 'Sonidos Guayana'
 import sys
-from PyQt4.QtGui import *
-from PyQt4.QtCore import QObject, pyqtSlot, SIGNAL
-from assets import AnvizReader
-from ui import GUI, tabla, controles_tabla
-from assets.to_excel import ToExcel
-from ui.configuration_views import PersonalSetup
+import time
+from PyQt4 import uic
+from PyQt4.QtCore import Qt
+from PyQt4 import QtCore, QtGui, QtSql
+from assets.anviz_reader import AnvizReader
+import assets.work_day_tools as tool
+import assets.dates_tricks as md
 
 
-class Controles(QWidget,
-                controles_tabla.Ui_Form):
-    def __init__(self, parent):
-        super(Controles, self).__init__()
+qtCreatorFile = "ui\\MainView.ui"
+Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
+
+
+ID, DAY, WORKER, INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3,  SHIFT = list(range(10))
+
+
+class MainView(Ui_MainWindow, QtBaseClass):
+    def __init__(self):
+        super().__init__()
         self.setupUi(self)
-        self.parent = parent
 
-        self.reporte = self.getDatosLector()
+        self.anvReader = AnvizReader()
 
-        first_date, last_date = self.reporte.content[0].date, self.reporte.content[-1].date
-        self.qdateFrom.setDate(first_date)
-        self.qdateTo.setDate(last_date)
+        self.anvReader.updateTable()
 
-        self.reporte = None
+        self.model = QtSql.QSqlRelationalTableModel(self)
+        self.model.setTable('WorkDays')
+        self.model.setRelation(WORKER, QtSql.QSqlRelation("Userinfo", "Userid",
+                                                          "Name"))
+        self.model.select()
 
-    @pyqtSlot()
-    def on_qbuttonGenerar_clicked(self, **kwargs):
-        self.reporte = self.getDatosLector()
-        dateFrom = self.qdateFrom.date().toPyDate()
-        dateTo = self.qdateTo.date().toPyDate()
-        self.reporte.filter(dateFrom, dateTo)
-        self.parent.tables.loadRange(self.reporte)
+        self.nameFilter = QtGui.QSortFilterProxyModel(self)
+        self.nameFilter.setSourceModel(self.model)
+        self.nameFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.nameFilter.setFilterKeyColumn(WORKER)
 
-    @pyqtSlot()
-    def on_excelButton_clicked(self, **kwargs):
-        content = self.parent.tables
-        to_excel = ToExcel()
-        to_excel.add_sheet("Logs")
-        to_excel.goto_sheet("Logs")
-        to_excel.append(content.tablesContent['logs'])
-        to_excel.autofit()
-        to_excel.add_sheet("Total")
-        to_excel.goto_sheet("Total")
-        to_excel.append(content.tablesContent['rango'])
-        from xlwings import Sheet
-        Sheet('Total').autofit()
-        Sheet('Logs').autofit()
+        self.scheduleFilter = QtGui.QSortFilterProxyModel(self)
+        self.scheduleFilter.setSourceModel(self.nameFilter)
+        self.scheduleFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.scheduleFilter.setFilterKeyColumn(SHIFT)
 
-    def getDatosLector(self):
-        datoslector = AnvizReader.Reorganizar()
-        datoslector.organizar_por_fecha()
-        datoslector.calculateWorkedTime()
-        return datoslector
+        self.dateFilter = tool.DateFilterProxyModel(self)
+        self.dateFilter.setSourceModel(self.scheduleFilter)
 
-    def __restoreDBADD(self):
-        import shelve, os
-        d = os.getcwd() + '\\Att2003.mdb'
-        a = shelve.open('config')
-        a['dbadd'] = d
-        a.close()
+        # self.qtable = QtGui.QTableView()
+        self.qtable.setModel(self.dateFilter)
+        self.qtable.setItemDelegate(tool.WorkDayDelegate(self))
+        for column in (0, 7, 8): self.qtable.setColumnHidden(column, True)
+        self.qtable.resizeColumnsToContents()
+        self.qtable.setSortingEnabled(False)
 
+        # self.qworkers = QtGui.QComboBox()
+        self.qworkers.addItems(
+            ["Todos"] + self.anvReader.workers_names)
+        self.qdatesfilter.setCurrentIndex(0)
+        self.qdate.setDate(QtCore.QDate().currentDate())
 
-class MainViewController(QMainWindow,
-                         GUI.Ui_MainWindow):
-    def __init__(self, parent=None):
-        #cargando la interfaz
-        super(MainViewController, self).__init__(parent)
-        self.setupUi(self)
-        self.tables = tabla.Table()
-        self.controls = Controles(self)
-        self.gridLayout.addWidget(self.tables, 0, 0)
-        self.gridLayout.addWidget(self.controls, 0, 1)
-        self.actionPersonal.triggered.connect(self.personalSetup)
-        self.actionBase_de_datos.triggered.connect(self.addressDataBase)
+        # self.qschedules = QtGui.QComboBox()
+        self.qschedules.addItems(
+            ["Todos"] + list(map(lambda x: str(x.id), self.anvReader.schedules_map.keys())))
+        self.qdatesfilter.setCurrentIndex(0)
+        self.qdate.setDate(QtCore.QDate().currentDate())
 
-    def personalSetup(self):
-        ps = PersonalSetup()
-        ps.exec_()
+        # mostrar todos los registros al inicio
+        self.nameFilter.setFilterRegExp('.*')
+        self.dateFilter.removeFilter()
 
-    def addressDataBase(self):
-        import tkinter
-        from tkinter import filedialog
-        import shelve
-        tk = tkinter.Tk()
-        tk.withdraw()
-        filename = filedialog.askopenfile(parent=tk, mode='r', defaultextension='*.mdb', filetypes=[('Microsoft Access Driver', '*.mdb')])
-        tk.destroy()
-        if not filename: return
-        filename = filename.name.replace('/', '\\')
+    @QtCore.pyqtSlot("QString")
+    def on_qworkers_currentIndexChanged(self, text):
+        print(text)
+        if text == "Todos":
+            self.nameFilter.setFilterRegExp('.*')
+        else:
+            self.nameFilter.setFilterRegExp(text)
 
-        try:
-            from persistence.sql import SQL
-            sql = SQL()
-            sql.close()
-        except:
-            print('Direccion invalida.', filename)
+    @QtCore.pyqtSlot("QString")
+    def on_qschedules_currentIndexChanged(self, text):
+        print(text)
+        if text == "Todos":
+            self.scheduleFilter.setFilterRegExp('.*')
+        else:
+            self.scheduleFilter.setFilterRegExp(text)
+
+    @QtCore.pyqtSlot("QDate")
+    def on_qdate_dateChanged(self, d):
+        self.dateFilter.setSingleDateFilter(d)
+
+    @QtCore.pyqtSlot("int")
+    def on_qdatesfilter_activated(self, option):
+        self.dateFilter.removeFilter()
+        if option == 1:
+            self.dateFilter.setSingleDateFilter(option)
+
+    @QtCore.pyqtSlot()
+    def on_qprint_clicked(self):
+        self.qprint.setDisabled(True)
+        printFilter = tool.DateFilterProxyModel()
+        printFilter.setSourceModel(self.dateFilter)
+        FIRST_REGISTER = 0
+        LAST_REGISTER = printFilter.rowCount() - 1
+
+        # Si no hay registros retorna None
+        if LAST_REGISTER == 0:
             return
-        print(filename)
 
-        shelve_ = shelve.open('config')
-        shelve_['dbadd'] = filename
-        shelve_.close()
+        from_date = printFilter.index(FIRST_REGISTER, DAY).data().toPyDateTime().date()
+        to_date = printFilter.dateFilter.index(LAST_REGISTER, DAY).data().toPyDateTime().date()
+
+        for date in md.MyDates.dates_range(from_date, to_date):
+            printFilter.setSingleDateFilter(date)
+            # from_date1 =
+            print()
+
+
+        QtGui.QApplication.processEvents()  # flushes the signal queue and prevents multiple clicks
+
+        self.qprint.setDisabled(False)
+
+    @QtCore.pyqtSlot()
+    def on_qdatesrangebutton_clicked(self):
+        self.dateFilter.setRangeDateFilter(self.qfromdate.date(),
+                                           self.qtodate.date())
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    mainview_controller = MainViewController()
-    mainview_controller.show()
-
-    app.exec()
+    app = QtGui.QApplication(sys.argv)
+    window = MainView()
+    window.show()
+    sys.exit(app.exec())
 
 
 

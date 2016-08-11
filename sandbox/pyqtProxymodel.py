@@ -52,7 +52,7 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
 
         self.mapper = QtGui.QDataWidgetMapper(self)
         self.mapper.setSubmitPolicy(QtGui.QDataWidgetMapper.AutoSubmit)
-        self.mapper.setModel(self.model)
+        self.mapper.setModel(self.proxymodel)
         self.mapper.addMapping(self.a, A)
         self.mapper.addMapping(self.b, B)
         self.mapper.addMapping(self.c, C)

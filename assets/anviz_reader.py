@@ -5,7 +5,6 @@ import datetime as dt
 from assets.performance import Workday, WorkersPerformance
 from assets.sql import SQL, Setup, AnvizRegisters
 from assets.horarios import HorarioDiurno, HorarioNocturno
-from assets.diasnolaborables import DiasNoLaborables
 from assets.dates_tricks import MyDates as md
 from PyQt4 import QtSql
 from PyQt4 import QtGui
@@ -117,8 +116,9 @@ class AnvizReader:
         """
         Una vez analizados todos los registros, estos seran almacenados en la tabla
         """
+
         for workday in workdays:
-            for w, register in workday.items():
+            for w, register in sorted(workday.items()):
                 self.anvRgs.insertInto("WorkDays", *register)
 
         d2 = md.ahora()
@@ -182,7 +182,7 @@ def update():
 
 def tests():
     reader = AnvizReader()
-    pprint(reader.workers_shift)
+    pprint(sorted(reader.workers_by_id.items()))
     pprint(reader.schedules_map)
     sys.exit()
 

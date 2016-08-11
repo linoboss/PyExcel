@@ -9,6 +9,7 @@ import datetime as dt
 qtCreatorFile = "ui\\scheduleConfiguration.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
 
+
 # TODO add to the program my own Schedule Configuration interface, for now, i'll work with the default
 class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
     def __init__(self):

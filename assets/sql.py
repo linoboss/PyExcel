@@ -452,7 +452,7 @@ class AnvizRegisters:
                 name = self.query.value(1)
                 workers[id_] = name
 
-        elif option == "shifts by Name":
+        elif option == "shifts by name":
             self.query.exec("SELECT Name, Schname "
                             "FROM ("
                             "   Userinfo a "
@@ -531,10 +531,13 @@ class AnvizRegisters:
                             "   MAX(InTime_3), "
                             "   MAX(OutTime_3) "
                             "FROM WorkDays")
+
             self.query.next()
-            print([self.query.value(i) for i in range(6)])
-
-
+            max_date = max([self.query.value(i) for i in range(6)])
+            if max_date == QtCore.QDateTime():
+                return None
+            else:
+                return max_date.toPyDateTime()
         else:
             raise KeyError(table + " is not a valid option")
 
@@ -599,9 +602,6 @@ class AnvizRegisters:
         if name == "WorkDays":
             """
             Automaticaly adds newer registers than the already available at the table
-            """
-
-            """
             Get the dates of the logs that havce not been appended to the WorkDays table
             """
             from_date = self.max_date_of("WorkDays")
@@ -616,8 +616,6 @@ class AnvizRegisters:
             dates_range = md.dates_range(from_date, to_date)
             for date in dates_range:
                 pass
-
-
             """
             Get the registers of a specific date
             """
@@ -690,7 +688,9 @@ def updateTable(name):
 
 def genericTest():
     anvizRegs = AnvizRegisters()
-    print(anvizRegs.schedules_map())
+    pprint(anvizRegs.getShcedulesDetails())
+    pprint(list(map(lambda x: str(x.id), anvizRegs.schedules_map().keys())))
+    # pprint(anvizRegs.getWorkers("shifts by name"))
     anvizRegs.db.close()
     sys.exit()
 
@@ -753,9 +753,9 @@ if __name__ == "__main__":
     # setSetupPath()
     # getShcedulesDetails()
     # getWorkers()
-    # update()
-    createTable("WorkDays")
+    update()
+    # createTable("WorkDays")
     # genericTest()
     # insertInto()
-    dates()
+    # dates()
     app.exec()
