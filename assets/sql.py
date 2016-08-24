@@ -468,7 +468,7 @@ class AnvizRegisters:
                 sch = self.query.value(1).lower()
                 workers[name] = sch
 
-        elif option == "shifts by Id":
+        elif option == "shifts by id":
             self.query.exec("SELECT a.Userid, b.Schid "
                             "FROM ("
                             "   Userinfo a "
@@ -592,43 +592,6 @@ class AnvizRegisters:
             message = error
 
         return message
-
-    def updateTable(self, name):
-        """
-        Update the table selected by name
-        :param name: name of the table to update
-        :return: a message with the result of the operation
-        """
-        if name == "WorkDays":
-            """
-            Automaticaly adds newer registers than the already available at the table
-            Get the dates of the logs that havce not been appended to the WorkDays table
-            """
-            from_date = self.max_date_of("WorkDays")
-
-            if from_date is None:
-                from_date = self.min_date_of("Checkinout")
-
-            to_date = self.max_date_of("Checkinout")
-            """
-            Iterate over dates
-            """
-            dates_range = md.dates_range(from_date, to_date)
-            for date in dates_range:
-                pass
-            """
-            Get the registers of a specific date
-            """
-            self.query.prepare("SELECT Logid, Userid, CheckTime "
-                               "FROM Checkinout "
-                               "WHERE FORMAT(CheckTime, 'yyyy-mm-dd') = FORMAT(:from_date, 'yyyy-mm-dd')")
-            self.query.bindValue(":from_date", QtCore.QDate(from_date))
-            self.query.exec_()
-
-            while self.query.next():
-                print([self.query.value(i) for i in range(3)])
-
-        return self.howthequerydid(name)
 
     def value(self, i):
         return self.query.value(i)

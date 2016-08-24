@@ -40,10 +40,7 @@ html += ("<html>"
          "</body>"
          "</html>".format(tr="", td="padding:50px"))
 
-doc.setHtml(html)
 
-doc.print_(printer)
-doc.documentLayout().setPaintDevice(printer)
 # Done.
 
 

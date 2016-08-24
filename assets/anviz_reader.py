@@ -35,8 +35,9 @@ class AnvizReader:
 
         self.schedules_details = self.anvRgs.getShcedulesDetails()
         self.schedules_map = self.anvRgs.schedules_map()
+        self.schedules = list(map(lambda x: str(x.name), self.schedules_map.keys()))
         self.workers_by_id = self.anvRgs.getWorkers("byId")
-        self.workers_shift = self.anvRgs.getWorkers("shifts by Id")
+        self.workers_shift = self.anvRgs.getWorkers("shifts by id")
 
         self.exeptions = []  # list of indexes of Checkinout logs that failed the validation
 
@@ -76,7 +77,6 @@ class AnvizReader:
                                "ORDER BY CheckTime ASC".format(from_date=from_date,
                                                                to_date=to_date,
                                                                operator=search_operator))
-
         LOGID, USERID, CHECKTIME = 0, 1, 2
 
         if not self.anvRgs.next():
@@ -105,6 +105,8 @@ class AnvizReader:
                         workday[userid][2 + time_pos] = checktime
                     else:
                         self.exeptions.append(logid)
+
+                    workday[userid][8] = self.workers_shift[userid]
 
                 # user defines the schedule, while the checktime defines the shift
                 # go to the next register

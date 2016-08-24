@@ -3,7 +3,9 @@ from PyQt4 import uic
 from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, QtGui
 
-ID, DAY, WORKER, INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3, SHIFT = list(range(10))
+(ID, DAY, WORKER,
+ INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3,
+ SHIFT, WORKED_TIME, EXTRA_TIME, ABSENT_TIME) = list(range(13))
 
 
 class WorkDayDelegate(QtGui.QStyledItemDelegate):
@@ -12,28 +14,29 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         document = QtGui.QTextDocument()
+        column = index.column()
+        item = index.model().data(index)
 
         color = QtGui.QColor(255, 255, 255)
-
-        if index.column() == DAY:
-            datetime = index.model().data(index)
-            if datetime.date().day() % 2 == 0:
+        if column == DAY:
+            if item.date().day() % 2 == 0:
 
                 color = QtGui.QColor(200, 200, 255)
             else:
                 color = QtGui.QColor(200, 255, 200)
-            text = str(datetime.date().toString())
+            text = item.toString("yyyy-MM-dd")
 
-        elif index.column() == WORKER:
-            worker = index.model().data(index)
-            text = worker
+        elif column == WORKER:
+            text = str(item)
 
-        elif index.column() == SHIFT:
-            shift = index.model().data(index)
-            text = str(shift)
+        elif column == SHIFT:
+            text = str(item)
+        elif isinstance(item, QtCore.QDateTime):
+            text = item.toString("hh:mm")
+        elif isinstance(item, QtCore.QTime):
+            text = item.toString('hh:mm')
         else:
-            date = index.model().data(index)
-            text = str(date.time().toString())
+            text = str(item)
 
         painter.save()
         painter.fillRect(option.rect, color)
@@ -48,10 +51,10 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         pass
 
-"""
     def sizeHint(self, option, index):
-        pass
+        return QtCore.QSize(100, 20)
 
+    """
     def createEditor(self, parent, option, index):
         pass
 
@@ -96,8 +99,10 @@ class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
         Reimplemented from base class
         Executes a set of tests from the filterFunctions, if any fails, the row is rejected
         """
-        dateindex = self.sourceModel().index(row, DAY, parent)
-        date = self.sourceModel().data(dateindex).date()
+        date = self.sourceModel().index(row, DAY, parent).data()
+        if date is None:
+            return False
+        date = date.date()
 
         if self.mode == "single":
             return date == self.single_date
@@ -123,4 +128,76 @@ class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
             return leftdate < rightdate
         else: return True
 
+
+class CalculusModel(QtGui.QIdentityProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.calculations = []
+
+    def columnCount(self, QModelIndex_parent=None, *args, **kwargs):
+        return self.sourceModel().columnCount()
+
+    def rowCount(self, QModelIndex_parent=None, *args, **kwargs):
+        return self.sourceModel().rowCount()
+
+    def data(self, index, role=None):
+        row = index.row()
+        column = index.column()
+        if not index.isValid():
+            return None
+        item = self.sourceModel().data(self.sourceModel().index(row, column))
+
+        if role == QtCore.Qt.EditRole:
+            return None
+        elif role == QtCore.Qt.DisplayRole:
+            if column == DAY:
+                return item
+            elif column >= WORKED_TIME:
+                if self.calculations:
+                    if column == 10:
+                        return self.calculations[row][0]
+                    elif column == 11:
+                        return self.calculations[row][1]
+                    elif column == 12:
+                        return self.calculations[row][2]
+        elif column == 10:
+            return self.calculations[row][0]
+        elif column == 11:
+            return self.calculations[row][1]
+        elif column == 12:
+            return self.calculations[row][2]
+        return item
+
+    def flags(self, index):
+        return QtCore.Qt.ItemIsEnabled
+
+    def calculateWorkedHours(self):
+        self.beginInsertColumns(QtCore.QModelIndex(), 10, 13)
+        self.insertColumns(10, 3)
+        self.endInsertColumns()
+
+        for row in range(self.rowCount()):
+            # index = self.proxymodel.createIndex(r, 10)
+            total_seconds = 0
+            for column in (INTIME_1, INTIME_2, INTIME_3):
+                in_ = self.sourceModel().data(self.sourceModel().index(row, column))
+                out = self.sourceModel().data(self.sourceModel().index(row, column + 1))
+                if in_ is None or out is None:
+                    return [QtCore.QTime(0, 0, 0)] * 3
+                total_seconds += in_.secsTo(out)
+            worked_time = QtCore.QTime(0, 0, 0).addSecs(
+                total_seconds)
+
+            relative_time = QtCore.QTime(8, 0, 0).secsTo(worked_time)
+            if relative_time > 0:
+                extra_time = QtCore.QTime(0, 0, 0).addSecs(relative_time)
+                absent_time = QtCore.QTime(0, 0, 0)
+            else:
+                extra_time = QtCore.QTime(0, 0, 0)
+                absent_time = QtCore.QTime(0, 0, 0).addSecs(- relative_time)
+
+            self.calculations.append(
+                [worked_time, extra_time, absent_time]
+            )
+        self.emit(QtCore.SIGNAL("dataChanged()"), self)
 
