@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>727</width>
-    <height>588</height>
+    <height>0</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,13 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="topMargin">
@@ -321,8 +328,20 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuConfiguracion">
+    <property name="title">
+     <string>Configuracion</string>
+    </property>
+    <addaction name="actionBase_de_datos"/>
+   </widget>
+   <addaction name="menuConfiguracion"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionBase_de_datos">
+   <property name="text">
+    <string>Base de datos</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -349,12 +368,12 @@
    <slot>stepDown()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>395</x>
-     <y>80</y>
+     <x>420</x>
+     <y>119</y>
     </hint>
     <hint type="destinationlabel">
-     <x>314</x>
-     <y>92</y>
+     <x>339</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -365,12 +384,12 @@
    <slot>stepUp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>476</x>
-     <y>90</y>
+     <x>501</x>
+     <y>119</y>
     </hint>
     <hint type="destinationlabel">
-     <x>301</x>
-     <y>83</y>
+     <x>339</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>

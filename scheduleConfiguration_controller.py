@@ -21,7 +21,6 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
         print("btn_a")
 
 
-
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     schConfig_controller = ScheduleConfiguration_Controller()

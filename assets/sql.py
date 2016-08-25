@@ -11,205 +11,38 @@ global_var = globals()
 global_var['CONFIG_FILE'] = '..\\persistence\\config'
 
 
-class SQL:
-
-    def __init__(self):
-        # set up some constants
-        shelve_ = shelve.open(global_var['CONFIG_FILE'], flag='rw', protocol=None, writeback=False)
-        dbadd = shelve_['dbadd']
-        print('s', dbadd)
-        shelve_.close()
-        MDB = dbadd; DRV = '{Microsoft Access Driver (*.mdb)}'; PWD = 'pw'
-
-        # connect to db
-        self.con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        self.cur = self.con.cursor()
-
-    def loadChekInOutTable(self):
-        SQLcommand = 'SELECT * FROM Userinfo'  # your query goes here
-        userinfo_table = self.cur.execute(SQLcommand)
-        rows = userinfo_table.fetchall()
-
-        personal_ids = {}
-        for row in rows:
-            personal_ids[str(row[0])] = row[1]
-
-        # run a query and get the results
-        SQLcommand = 'SELECT * FROM Checkinout'  # your query goes here
-        checkinout_table = self.cur.execute(SQLcommand)
-        rows = checkinout_table.fetchall()
-
-        """
-        Reorganizar la matriz en las siguientes columnas:
-        Nombre	Hora y fecha	 ¿entrada o salida?
-        de checkeo
-        """
-        result = []
-        ids = personal_ids.keys()
-        for row in rows:
-            userid = row[1]
-            if userid in ids:
-                result.append([
-                    personal_ids[userid],
-                    row[2],
-                    row[3]
-                    ])
-
-        columns = [column[0] for column in self.cur.description]
-
-        SQLcommand = 'SELECT CheckTime FROM Checkinout'  # your query goes here
-        checkinout_table = self.cur.execute(SQLcommand)
-        dates = checkinout_table.fetchall()
-        dates = [d[0] for d in dates]
-        self.close()
-        self.personal = personal_ids.values()
-        self.data_matrix = result
-        self.headers = columns
-        self.dates = [dt.date(*d.timetuple()[:3]) for d in dates]
-        self.dates = sorted(list(set(self.dates)))
-
-    def getMinDate(self):
-        self.cur.execute("SELECT ")
-
-    @property
-    def personalShift(self):
-        personalShift = {}
-        shift = {}
-        schedule = {}
-
-        SQLcommand = 'SELECT * FROM Userinfo'  # your query goes here
-        userinfo_table = self.cur.execute(SQLcommand)
-        personalID = dict([(tab[0], tab[1]) for tab in userinfo_table.fetchall()])
-
-        SQLcommand = 'SELECT * FROM UserShift'  # your query goes here
-        usershift_table = self.cur.execute(SQLcommand)
-        shift = dict([(tab[0], tab[1]) for tab in usershift_table.fetchall()])
-
-        SQLcommand = 'SELECT * FROM Schedule'  # your query goes here
-        schedule_table = self.cur.execute(SQLcommand)
-        schedule = dict([(tab[0], tab[1]) for tab in schedule_table.fetchall()])
-
-        self.close()
-
-        for k, v in personalID.items():
-            try:
-                personalShift[v] = schedule[shift[k]].lower()
-            except:
-                pass
-        return personalShift
-
-    def close(self):
-        self.cur.close()
-        self.con.close()
-
-
-class Setup:
-
-    def __init__(self):
-        shelve_ = shelve.open(global_var['CONFIG_FILE'], flag='rw', protocol=None, writeback=False)
-        setupadd = shelve_['setupadd']
-        print('s', setupadd)
+class ConfigFile:
+    @staticmethod
+    def create():
+        shelve_ = shelve.open(global_var['CONFIG_FILE'],
+                              flag='c')
         shelve_.close()
 
-        MDB = setupadd; DRV = '{Microsoft Access Driver (*.mdb, *.accdb)}'; PWD = 'pw'
-        # connect to db
-        self.con = pyodbc.connect('DRIVER={};DBQ={};PWD={}'.format(DRV, MDB, PWD))
-        self.cur = self.con.cursor()
+    @staticmethod
+    def exist():
+        return (os.path.exists(global_var['CONFIG_FILE']) +
+                '.bak')
 
-    def addWorker(self, worker, status, horario, numero):
-        SQLcommand = "INSERT INTO Trabajadores (Nombre, Status, Horario, Numero) VALUES ('{}', {}, '{}', {});"\
-            .format(worker, status, horario, numero)  # your query goes here
-        self.cur.execute(SQLcommand)
-        self.con.commit()
-        self.close()
-
-    def getWorkerID(self):
-        SQLcommand = "SELECT ID, Nombre FROM Trabajadores"  # your query goes here
-        workerstatus_table = self.cur.execute(SQLcommand)
-        rows = workerstatus_table.fetchall()
-
-        workerId = {}
-        for row in rows:
-            workerId[str(row[1])] = row[0]
-        self.close()
-        return workerId
-
-    def modifyWorker(self, id_, nombre, status, horario, numero):
-        SQLcommand = "UPDATE Trabajadores SET Nombre='{}', Status={}, Horario='{}', Numero={} WHERE Id={};"\
-            .format(nombre, status, horario, numero, id_)
-        self.cur.execute(SQLcommand)
-        self.con.commit()
-
-    def getWorkerStatus(self):
-        SQLcommand = "SELECT * FROM Trabajadores"  # your query goes here
-        workerstatus_table = self.cur.execute(SQLcommand)
-        rows = workerstatus_table.fetchall()
-
-        workerstatus = {}
-        for row in rows:
-            workerstatus[str(row[1])] = row[3]
-
-        self.close()
-        return workerstatus
-
-    def getWorkersTable(self):
-        SQLcommand = "SELECT * FROM Trabajadores"  # your query goes here
-        workerstatus_table = self.cur.execute(SQLcommand)
-        workerstatus = workerstatus_table.fetchall()
-        self.close()
-        return workerstatus
-
-    def personalShift(self):
-        SQLcommand = "SELECT Nombre, Horario, Status FROM Trabajadores"  # your query goes here
-        workerstatus_table = self.cur.execute(SQLcommand)
-        rows = workerstatus_table.fetchall()
-
-        personalShift = {}
-        for row in rows:
-            if row[2]:
-                personalShift[str(row[0])] = row[1]
-
-        self.close()
-        return personalShift
-
-    def removeWorkers(self, numbers):
-        result = ""
-        length = len(numbers)
-        if isinstance(numbers, list):
-            for i in range(length):
-                num = numbers[i]
-                if i != length - 1:
-                    result += "Numero=" + str(num) + " OR "
-                else:
-                    result += "Numero=" + str(num) + ';'
-        SQLcommand = 'DELETE FROM Trabajadores WHERE {}'.format(result)
-        print(SQLcommand)
-        self.cur.execute(SQLcommand)
-        self.con.commit()
-        self.close()
-
-    def close(self):
-        self.cur.close()
-        self.con.close()
-
-
-class EditConfigFile:
     @staticmethod
     def setDatabasePath(database_path):
         """
         :param database_path: path to the database
         """
-        shelve_ = shelve.open(global_var['CONFIG_FILE'], flag='rw', protocol=None, writeback=True)
+        shelve_ = shelve.open(global_var['CONFIG_FILE'],
+                              flag='w', protocol=None,
+                              writeback=True)
         shelve_['dbadd'] = database_path
         shelve_.close()
         return database_path
 
     @staticmethod
-    def setSetupFilePath(setup_path):
-        shelve_ = shelve.open(global_var['CONFIG_FILE'], flag='rw', protocol=None, writeback=True)
-        shelve_['setupadd'] = setup_path
+    def getDatabasePath():
+        shelve_ = shelve.open(global_var['CONFIG_FILE'],
+                              flag='r', protocol=None,
+                              writeback=True)
+        path = shelve_['dbadd']
         shelve_.close()
-        return setup_path
+        return path
 
 
 class SchMapping:
@@ -251,7 +84,7 @@ class AnvizRegisters:
 
         self.db = QtSql.QSqlDatabase.addDatabase("QODBC")
 
-        MDB = r"C:\workspace\PyExcel\sandbox\Att2003.mdb"
+        MDB = ConfigFile.getDatabasePath()
         DRV = '{Microsoft Access Driver (*.mdb)}'
         PWD = 'pw'
 
@@ -261,6 +94,11 @@ class AnvizRegisters:
             raise ConnectionError("UNABLE TO CONECT TO THE DATABASE ")
 
         self.query = QtSql.QSqlQuery()
+
+    def tableExists(self, name):
+        if name == "WorkDays":
+            self.query.exec("SELECT workdayid FROM WorkDays")
+            return self.howthequerydid() == "Query completed"
 
     def createTable(self, name):
         """
@@ -274,7 +112,7 @@ class AnvizRegisters:
         if name == "WorkDays":
             self.query.exec("CREATE TABLE WorkDays "
                             "("
-                            "id AUTOINCREMENT, "
+                            "workdayid AUTOINCREMENT, "
                             "day DATE NOT NULL, "
                             "worker VARCHAR(50) REFERENCES Userinfo(Userid), "
                             "InTime_1 DATETIME, "
@@ -327,7 +165,7 @@ class AnvizRegisters:
 
     def randomLoad(self, name):
         if name == "WorkDays":
-            self.query.prepare("INSERT INTO WorkDays (id, worker, checkin, checkout, shift) "
+            self.query.prepare("INSERT INTO WorkDays (workdayid, worker, checkin, checkout, shift) "
                                "VALUES (:id, :worker, :checkin, :checkout, :shift)")
 
             self.query.bindValue(":id", 2)
@@ -346,7 +184,8 @@ class AnvizRegisters:
         """
         shift_details = dict()
         if option == "byName":
-            self.query.exec("SELECT DISTINCT c.Schname, Timename, Intime, Outtime, BIntime, EIntime, BOuttime, EOuttime "
+            self.query.exec("SELECT DISTINCT c.Schname, Timename, Intime, Outtime, "
+                            "   BIntime, EIntime, BOuttime, EOuttime "
                             "FROM ("
                             "   TimeTable a "
                             "   INNER JOIN "
@@ -550,7 +389,7 @@ class AnvizRegisters:
 
     def max_index_of(self, table):
         if table == 'WorkDays':
-            self.query.exec("SELECT MAX(id) "
+            self.query.exec("SELECT MAX(workdayid) "
                             "FROM WorkDays")
         else:
             raise KeyError(table + " is not a valid option")
@@ -564,7 +403,7 @@ class AnvizRegisters:
 
     def min_index_of(self, table):
         if table == 'WorkDays':
-            self.query.exec("SELECT MIN(id) "
+            self.query.exec("SELECT MIN(workdayid) "
                             "FROM WorkDays")
         else:
             raise KeyError(table + " is not a valid option")
@@ -606,7 +445,7 @@ class AnvizRegisters:
 
 
 def setDatabasePath():
-    config_editor = EditConfigFile()
+    config_editor = ConfigFile()
 
     file_name = QtGui.QFileDialog.getOpenFileName(None, "Open")
     app.closeAllWindows()
@@ -614,7 +453,7 @@ def setDatabasePath():
 
 
 def setSetupPath():
-    config_editor = EditConfigFile()
+    config_editor = ConfigFile()
     file_name = QtGui.QFileDialog.getOpenFileName(None, "Open")
     print(config_editor.setSetupFilePath(file_name))
 
