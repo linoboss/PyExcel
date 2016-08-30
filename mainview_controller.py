@@ -1,5 +1,4 @@
 import sys
-import time
 from PyQt4 import uic
 from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, QtGui, QtSql
@@ -21,6 +20,8 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setGeometry(100, 100, 1200, 600)
+        self.stackedWidget.setCurrentIndex(0)
 
         self.anvReader = AnvizReader()
 
@@ -34,9 +35,15 @@ class MainView(Ui_MainWindow, QtBaseClass):
                                                          "Schname"))
         self.model.sort(DAY, Qt.AscendingOrder)
         self.model.select()
+        while self.model.canFetchMore():
+            self.model.fetchMore()
+
+        self.calculusModel = tool.CalculusModel(self)
+        self.calculusModel.setSourceModel(self.model)
+        self.calculusModel.calculateWorkedHours()
 
         self.nameFilter = QtGui.QSortFilterProxyModel(self)
-        self.nameFilter.setSourceModel(self.model)
+        self.nameFilter.setSourceModel(self.calculusModel)
         self.nameFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self.nameFilter.setFilterKeyColumn(WORKER)
 
@@ -48,12 +55,16 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.dateFilter = tool.DateFilterProxyModel(self)
         self.dateFilter.setSourceModel(self.scheduleFilter)
 
-        self.calculusModel = tool.CalculusModel(self)
-        self.calculusModel.setSourceModel(self.dateFilter)
-        self.calculusModel.calculateWorkedHours()
+        scheduleFilter = QtGui.QSortFilterProxyModel(self)
+        scheduleFilter.setSourceModel(self.dateFilter)
+        scheduleFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        scheduleFilter.setFilterKeyColumn(SHIFT)
+
+        printFilter = tool.DateFilterProxyModel()
+        printFilter.setSourceModel(scheduleFilter)
 
         # self.qtable = QtGui.QTableView()
-        self.qtable.setModel(self.calculusModel)
+        self.qtable.setModel(printFilter)
         self.qtable.setItemDelegate(tool.WorkDayDelegate(self))
         for column in (0, 7, 8): self.qtable.setColumnHidden(column, True)
         self.qtable.resizeColumnsToContents()
@@ -77,7 +88,6 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot("QString")
     def on_qworkers_currentIndexChanged(self, text):
-        print(text)
         if text == "Todos":
             self.nameFilter.setFilterRegExp('.*')
         else:
@@ -85,7 +95,6 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot("QString")
     def on_qschedules_currentIndexChanged(self, text):
-        print(text)
         if text == "Todos":
             self.scheduleFilter.setFilterRegExp('.*')
         else:
@@ -105,7 +114,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def on_qprint_clicked(self):
         self.qprint.setDisabled(True)
         scheduleFilter = QtGui.QSortFilterProxyModel(self)
-        scheduleFilter.setSourceModel(self.calculusModel)
+        scheduleFilter.setSourceModel(self.dateFilter)
         scheduleFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
         scheduleFilter.setFilterKeyColumn(SHIFT)
 
@@ -128,6 +137,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
         for date in md.MyDates.dates_range(from_date, to_date):
             printFilter.setSingleDateFilter(date)
+            if printFilter.rowCount() == 0: continue
             html += ("<html>"
                      "<body>"
                      "<table><tr>"
@@ -168,14 +178,13 @@ class MainView(Ui_MainWindow, QtBaseClass):
                         elif column == OUTTIME_3: continue
                         elif column == SHIFT: continue
                         elif INTIME_1 <= column <= OUTTIME_3:
-                            qdate = printFilter.index(row, column).data().time()
+                            qdate = printFilter.index(row, column).data()
                             if qdate == QtCore.QTime():
                                 item = '--:--'
                             else:
-                                item = qdate.toString("hh:ss")
+                                item = qdate.toString("hh:mm")
                         elif column >= WORKED_TIME:
                             item = printFilter.index(row, column).data().toString('hh:mm')
-                            print(item)
                         else:
                             item = printFilter.index(row, column).data()
                         html += "<td align=center style='{}'>".format(not_css["td"])
@@ -184,11 +193,11 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
                     html += "<td style='{}'></td>".format(not_css["td"])
                     html += "</tr>"
-                html += "</table><br><br><br>"
+                html += "</table>"
 
-            html += "<br>"*6
-            html += "<hr width=300>"
-            html += "<p style='margin-left:380px;'>Revisado por</p>"
+            #  html += "<br>"*6
+            #  html += "<hr width=300>"
+            #  html += "<p style='margin-left:380px;'>Revisado por</p>"
             html += "<div style='page-break-before:always'></div>"
 
         # send the html document to the printer
@@ -211,8 +220,6 @@ class MainView(Ui_MainWindow, QtBaseClass):
         QtGui.QApplication.processEvents()  # flushes the signal queue and prevents multiple clicks
 
         self.qprint.setDisabled(False)
-
-        print("printed")
 
     @QtCore.pyqtSlot()
     def on_qdatesrangebutton_clicked(self):

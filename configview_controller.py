@@ -29,20 +29,36 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
 
     @pyqtSlot()
     def on_init_clicked(self):
-        pass
+        if self.confirmar():
+            pass
+        else:
+            return
 
     @pyqtSlot()
     def on_erase_clicked(self):
-        print("erase")
+        if self.confirmar():
+            print('si')
+        else:
+            return
 
     @pyqtSlot()
     def on_eraseDay_clicked(self):
-        print("eraseDay")
+        if self.confirmar():
+            print('si')
+        else:
+            return
 
     @pyqtSlot()
     def on_buttonBox_accepted(self):
-        print("button_box")
+        pass
 
+    def confirmar(self):
+        messageBox = QtGui.QMessageBox()
+        messageBox.setStandardButtons(QtGui.QMessageBox.Yes |
+                                      QtGui.QMessageBox.No)
+        messageBox.setIcon(QtGui.QMessageBox.Question)
+        messageBox.setText("Esta seguro?")
+        return messageBox.exec() == QtGui.QMessageBox.Yes
 
 
 if __name__ == "__main__":

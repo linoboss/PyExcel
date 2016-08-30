@@ -169,7 +169,7 @@ class CalculusModel(QtGui.QIdentityProxyModel):
         return item
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def calculateWorkedHours(self):
         self.beginInsertColumns(QtCore.QModelIndex(), 10, 13)
@@ -180,8 +180,8 @@ class CalculusModel(QtGui.QIdentityProxyModel):
             # index = self.proxymodel.createIndex(r, 10)
             total_seconds = 0
             for column in (INTIME_1, INTIME_2, INTIME_3):
-                in_ = self.sourceModel().data(self.sourceModel().index(row, column))
-                out = self.sourceModel().data(self.sourceModel().index(row, column + 1))
+                in_ = self.data(self.sourceModel().index(row, column))
+                out = self.data(self.sourceModel().index(row, column + 1))
                 if in_ is None or out is None:
                     return [QtCore.QTime(0, 0, 0)] * 3
                 total_seconds += in_.secsTo(out)
@@ -200,4 +200,5 @@ class CalculusModel(QtGui.QIdentityProxyModel):
                 [worked_time, extra_time, absent_time]
             )
         self.emit(QtCore.SIGNAL("dataChanged()"), self)
+
 

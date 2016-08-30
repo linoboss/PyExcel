@@ -1,6 +1,5 @@
 # https://code.google.com/p/pyodbc/wiki/Cursor
 import sys, os
-import pyodbc
 import datetime as dt
 import shelve
 from PyQt4 import QtSql
@@ -8,7 +7,9 @@ from PyQt4 import QtCore
 from assets.dates_tricks import MyDates as md
 
 global_var = globals()
-global_var['CONFIG_FILE'] = '..\\persistence\\config'
+upper_directoy = os.getcwd()
+
+global_var['CONFIG_FILE'] = upper_directoy + '\\persistence\\config'
 
 
 class ConfigFile:
@@ -16,12 +17,14 @@ class ConfigFile:
     def create():
         shelve_ = shelve.open(global_var['CONFIG_FILE'],
                               flag='c')
+        shelve_['dbadd'] = ''
         shelve_.close()
 
     @staticmethod
     def exist():
-        return (os.path.exists(global_var['CONFIG_FILE']) +
-                '.bak')
+
+        return (os.path.exists(global_var['CONFIG_FILE'] +
+                               '.bak'))
 
     @staticmethod
     def setDatabasePath(database_path):
@@ -83,7 +86,6 @@ class AnvizRegisters:
     def __connect(self):
 
         self.db = QtSql.QSqlDatabase.addDatabase("QODBC")
-
         MDB = ConfigFile.getDatabasePath()
         DRV = '{Microsoft Access Driver (*.mdb)}'
         PWD = 'pw'
@@ -96,9 +98,7 @@ class AnvizRegisters:
         self.query = QtSql.QSqlQuery()
 
     def tableExists(self, name):
-        if name == "WorkDays":
-            self.query.exec("SELECT workdayid FROM WorkDays")
-            return self.howthequerydid() == "Query completed"
+        return name in self.db.tables()
 
     def createTable(self, name):
         """
@@ -151,17 +151,21 @@ class AnvizRegisters:
         return self.howthequerydid(name)
 
     def insertInto(self, table, *args):
-        print(table)
-        print(args)
         if table == "WorkDays":
             self.query.prepare("INSERT INTO WorkDays ("
                                "    day, worker, InTime_1, OutTime_1, InTime_2, "
                                "    OutTime_2, InTime_3 , OutTime_3, shift) "
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
             for i, value in enumerate(args):
-                print(i, value)
                 self.query.bindValue(i, value)
             self.query.exec_()
+
+    def deleteDay(self, day):
+        self.query.prepare("DELETE FROM WorkDays "
+                           "WHERE day=:day")
+        self.query.bindValue("day", QtCore.QDate(day))
+        self.query.exec_()
+        return self.howthequerydid()
 
     def randomLoad(self, name):
         if name == "WorkDays":
@@ -438,8 +442,16 @@ class AnvizRegisters:
     def next(self):
         return self.query.next()
 
-    def firstlog(self):
-        return
+    def first(self):
+        return self.query.first()
+
+    def last(self):
+        return self.query.last()
+
+    def disconnect(self):
+        self.db.close()
+        QtSql.QSqlDatabase.removeDatabase("db1")
+        del self.db
 
 # *** TESTS ***
 
@@ -470,12 +482,6 @@ def readTable(name):
     print(anvizRegs.readTable(name,
                               dt.datetime(2015, 1, 1),
                               dt.datetime(2015, 3, 1)))
-    q = anvizRegs.query
-
-    print("Logid\tUserid\tCheckTime\tCheckType")
-    while q.next():
-        print(q.value(0), q.value(1), q.value(2), q.value(3))
-
     anvizRegs.db.close()
     sys.exit()
 
@@ -492,7 +498,7 @@ def genericTest():
     anvizRegs = AnvizRegisters()
     pprint(anvizRegs.getShcedulesDetails())
     pprint(list(map(lambda x: str(x.id), anvizRegs.schedules_map().keys())))
-    # pprint(anvizRegs.getWorkers("shifts by name"))
+    pprint(anvizRegs.getWorkers("shifts by name"))
     anvizRegs.db.close()
     sys.exit()
 
@@ -526,6 +532,7 @@ def update():
 
 def insertInto():
     anvizRegs = AnvizRegisters()
+
     pprint(anvizRegs.insertInto("WorkDays", *(
         QtCore.QDate(dt.date(2014, 9, 2)),
         '10',
@@ -539,6 +546,10 @@ def insertInto():
     )))
     anvizRegs.db.close()
     sys.exit()
+
+def deleteDay(day):
+    anvRgs = AnvizRegisters()
+    anvRgs.deleteDay(day)
 
 
 def dates():
@@ -555,9 +566,10 @@ if __name__ == "__main__":
     # setSetupPath()
     # getShcedulesDetails()
     # getWorkers()
-    update()
+    # update()
     # createTable("WorkDays")
     # genericTest()
     # insertInto()
     # dates()
+    deleteDay(dt.datetime.today().date())
     app.exec()

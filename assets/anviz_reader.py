@@ -2,11 +2,8 @@ __author__ = 'Lino Bossio'
 
 import sys
 import datetime as dt
-from assets.performance import Workday, WorkersPerformance
-from assets.sql import SQL, Setup, AnvizRegisters
-from assets.horarios import HorarioDiurno, HorarioNocturno
+from assets.sql import AnvizRegisters
 from assets.dates_tricks import MyDates as md
-from PyQt4 import QtSql
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
@@ -59,11 +56,12 @@ class AnvizReader:
 
     def updateTable(self):
         from_date = self.anvRgs.max_date_of("WorkDays")
-        search_operator = '>'
 
         if from_date is None:
             from_date = self.anvRgs.min_date_of("Checkinout")
             search_operator = '>='
+        else:
+            self.anvRgs.deleteDay(from_date)
 
         to_date = self.anvRgs.max_date_of("Checkinout")
         """
@@ -73,19 +71,16 @@ class AnvizReader:
 
         self.anvRgs.query.exec("SELECT Logid, Userid, CheckTime "
                                "FROM Checkinout "
-                               "WHERE CheckTime {operator} #{from_date}# AND CheckTime <= #{to_date}# "
+                               "WHERE CheckTime >= #{from_date}# AND CheckTime <= #{to_date}# "
                                "ORDER BY CheckTime ASC".format(from_date=from_date,
-                                                               to_date=to_date,
-                                                               operator=search_operator))
+                                                               to_date=to_date))
+
         LOGID, USERID, CHECKTIME = 0, 1, 2
 
         if not self.anvRgs.next():
-            print("Up to date")
-            print(self.anvRgs.query.lastError().text())
             return
 
         CheckDate = self.anvRgs.value(CHECKTIME).toPyDateTime().date()
-        d1 = md.ahora()
 
         workdays = []
 
@@ -122,9 +117,6 @@ class AnvizReader:
         for workday in workdays:
             for w, register in sorted(workday.items()):
                 self.anvRgs.insertInto("WorkDays", *register)
-
-        d2 = md.ahora()
-        print(d2 - d1)
 
     def __map_to_schedules(self, userid, checktime):
         """
@@ -184,7 +176,6 @@ def update():
 
 def tests():
     reader = AnvizReader()
-    pprint(sorted(reader.workers_by_id.items()))
     pprint(reader.schedules_map)
     sys.exit()
 
@@ -192,13 +183,11 @@ def tests():
 def run():
     reader = AnvizReader()
     pprint(reader.workers_names)
-    print(reader.first_date, reader.last_date)
     sys.exit()
 
 
 def maptest():
     reader = AnvizReader()
-    print(reader.__map_to_schedules('8', QtCore.QDateTime(2014,9,5,14,0,0)))
     sys.exit()
 
 if __name__ == "__main__":    # run()
