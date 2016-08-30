@@ -110,4 +110,5 @@ class Start:
         return file_name
 
 if __name__ == "__main__":
-    Start()
+    start = Start()
+    start.program()
