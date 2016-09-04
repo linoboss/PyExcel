@@ -2,6 +2,7 @@ import sys, os
 from PyQt4 import QtGui, QtCore
 from mainview_controller import MainView
 import assets.sql as sql
+import time
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No
@@ -12,13 +13,6 @@ class Start:
         self.app = QtGui.QApplication(sys.argv)
 
     def program(self):
-        start_dialog = QtGui.QDialog()
-        start_dialog.resize(500, 400)
-        start_dialog.setWindowFlags(QtCore.Qt.CustomizeWindowHint)
-        verticalLayout = QtGui.QVBoxLayout(start_dialog)
-        init_label = QtGui.QLabel("Iniciando el programa")
-        verticalLayout.addWidget(init_label)
-
         # Revision de elementos críticos para el funcionamiento
         # del programa
 
@@ -28,9 +22,6 @@ class Start:
         else:
             text = "Archivo de configuracion creado"
             sql.ConfigFile.create()
-
-        verticalLayout.addWidget(QtGui.QLabel(
-                text))
 
         # buscar archivo de la base de datos
         if os.path.exists(
@@ -43,10 +34,6 @@ class Start:
                 self.close()
 
             text = "Base de datos seleccionada"
-
-        verticalLayout.addWidget(QtGui.QLabel(
-                text))
-
         # conectar con la base de datos
         try:
             anvRgs = sql.AnvizRegisters()
@@ -65,8 +52,6 @@ class Start:
         anvRgs.disconnect()
 
         mainview = MainView()
-
-        start_dialog.close()
 
         mainview.show()
         sys.exit(self.app.exec())

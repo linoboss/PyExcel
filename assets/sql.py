@@ -7,9 +7,15 @@ from PyQt4 import QtCore
 from assets.dates_tricks import MyDates as md
 
 global_var = globals()
-upper_directoy = os.getcwd()
-
-global_var['CONFIG_FILE'] = upper_directoy + '\\persistence\\config'
+base_directory = os.getcwd()
+# get the correct base directory if accessed from any random file
+aux = base_directory.split('\\')
+while aux[-1] != 'PyExcel':
+    aux = aux[:-1]
+base_directory = str.join('\\', aux)
+global_var['CONFIG_FILE'] = base_directory + '\\persistence\\config'
+if __name__ == '__main__':
+    global_var['CONFIG_FILE'] = '\\'.join(base_directory.split('\\')[:-1]) + '\\persistence\\config'
 
 
 class ConfigFile:
@@ -18,6 +24,7 @@ class ConfigFile:
         shelve_ = shelve.open(global_var['CONFIG_FILE'],
                               flag='c')
         shelve_['dbadd'] = ''
+        shelve_['print_path'] = ''
         shelve_.close()
 
     @staticmethod
@@ -27,25 +34,45 @@ class ConfigFile:
                                '.bak'))
 
     @staticmethod
-    def setDatabasePath(database_path):
+    def set(option, value):
         """
-        :param database_path: path to the database
+        :param option: str
+        :param value: variant
+        :return: None
         """
         shelve_ = shelve.open(global_var['CONFIG_FILE'],
                               flag='w', protocol=None,
                               writeback=True)
-        shelve_['dbadd'] = database_path
+        if option == "database_path":
+            shelve_['dbadd'] = value
+        elif option == "print_path":
+            shelve_["print_path"] = value
+        else:
+            raise KeyError(option + " is not a valid option")
         shelve_.close()
-        return database_path
 
     @staticmethod
-    def getDatabasePath():
+    def get(option):
         shelve_ = shelve.open(global_var['CONFIG_FILE'],
                               flag='r', protocol=None,
                               writeback=True)
-        path = shelve_['dbadd']
+        if option == "database_path":
+            value = shelve_['dbadd']
+        elif option == "print_path":
+            value = shelve_["print_path"]
+        else:
+            raise KeyError(option + " is not a valid option")
         shelve_.close()
-        return path
+        return value
+
+    @staticmethod
+    def updateOptions():
+        shelve_ = shelve.open(global_var['CONFIG_FILE'],
+                              flag='rw', protocol=None,
+                              writeback=True)
+        for option in ['dbadd', 'print_path']:
+            if option not in shelve_.keys():
+                shelve_[option] = ''
 
 
 class SchMapping:
@@ -86,14 +113,15 @@ class AnvizRegisters:
     def __connect(self):
 
         self.db = QtSql.QSqlDatabase.addDatabase("QODBC")
-        MDB = ConfigFile.getDatabasePath()
+        MDB = ConfigFile.get("database_path")
         DRV = '{Microsoft Access Driver (*.mdb)}'
         PWD = 'pw'
 
         self.db.setDatabaseName("DRIVER={};DBQ={};PWD={}".format(DRV, MDB, PWD))
 
         if not self.db.open():
-            raise ConnectionError("UNABLE TO CONECT TO THE DATABASE ")
+            raise ConnectionError("UNABLE TO CONECT TO THE DATABASE IN " +
+                                  MDB)
 
         self.query = QtSql.QSqlQuery()
 
@@ -149,6 +177,18 @@ class AnvizRegisters:
             self.query.exec_()
 
         return self.howthequerydid(name)
+
+    def addColumn(self, table, name, type_):
+        self.query = QtSql.QSqlQuery()
+        print(self.query.lastQuery())
+        self.query.prepare("ALTER TABLE :table "
+                           "ADD COLUMN :name :type")
+        self.query.bindValue(":table", table)
+        self.query.bindValue(":name", name)
+        if type_ is bool: type_ = "INTEGER"
+        self.query.bindValue(":type", type_)
+        self.query.exec_()
+        return self.howthequerydid()
 
     def insertInto(self, table, *args):
         if table == "WorkDays":
@@ -306,6 +346,7 @@ class AnvizRegisters:
                             "   Schedule c "
                             "       ON (b.Schid = c.Schid) " +
                             ifActive)
+            print(self.howthequerydid())
             while self.query.next():
                 name = self.query.value(0)
                 sch = self.query.value(1).lower()
@@ -450,90 +491,54 @@ class AnvizRegisters:
 
     def disconnect(self):
         self.db.close()
-        QtSql.QSqlDatabase.removeDatabase("db1")
+        QtSql.QSqlDatabase.removeDatabase()
         del self.db
 
 # *** TESTS ***
 
 
 def setDatabasePath():
-    config_editor = ConfigFile()
-
-    file_name = QtGui.QFileDialog.getOpenFileName(None, "Open")
-    app.closeAllWindows()
-    print(config_editor.setDatabasePath(file_name))
-
-
-def setSetupPath():
-    config_editor = ConfigFile()
-    file_name = QtGui.QFileDialog.getOpenFileName(None, "Open")
-    print(config_editor.setSetupFilePath(file_name))
+    filename = QtGui.QFileDialog.getOpenFileName()
+    ConfigFile.set('database_path', filename)
 
 
 def createTable(name):
-    anvizRegs = AnvizRegisters()
-    print(anvizRegs.createTable(name))
-    anvizRegs.db.close()
-    sys.exit()
+    print(anvRgs.createTable(name))
 
 
 def readTable(name):
-    anvizRegs = AnvizRegisters()
-    print(anvizRegs.readTable(name,
+    print(anvRgs.readTable(name,
                               dt.datetime(2015, 1, 1),
                               dt.datetime(2015, 3, 1)))
-    anvizRegs.db.close()
-    sys.exit()
-
-
-def updateTable(name):
-    anvizRegs = AnvizRegisters()
-    print(anvizRegs.updateTable(name))
-    print('a', anvizRegs.query.value(0))
-    anvizRegs.db.close()
-    sys.exit()
 
 
 def genericTest():
-    anvizRegs = AnvizRegisters()
-    pprint(anvizRegs.getShcedulesDetails())
-    pprint(list(map(lambda x: str(x.id), anvizRegs.schedules_map().keys())))
-    pprint(anvizRegs.getWorkers("shifts by name"))
-    anvizRegs.db.close()
-    sys.exit()
+    pprint(anvRgs.getShcedulesDetails())
+    pprint(list(map(lambda x: str(x.id), anvRgs.schedules_map().keys())))
+    pprint(anvRgs.getWorkers("shifts by name"))
 
 
 def getShcedules():
-    anvizRegs = AnvizRegisters()
-    anvizRegs.getShcedulesDetails()
-    anvizRegs.db.close()
-    sys.exit()
+    anvRgs.getShcedulesDetails()
 
 
 def getWorkers():
-    anvizRegs = AnvizRegisters()
     print("byName")
-    pprint(anvizRegs.getWorkers("byName"))
+    pprint(anvRgs.getWorkers("byName"))
     print("byId")
-    pprint(anvizRegs.getWorkers("byId"))
+    pprint(anvRgs.getWorkers("byId"))
     print("shift")
-    pprint(anvizRegs.getWorkers("andShift"))
-    print(anvizRegs.howthequerydid())
-    anvizRegs.db.close()
-    sys.exit()
+    pprint(anvRgs.getWorkers("andShift"))
+    print(anvRgs.howthequerydid())
 
 
-def update():
-    anvizRegs = AnvizRegisters()
-    pprint(anvizRegs.updateTable("WorkDays"))
-    anvizRegs.db.close()
-    sys.exit()
+def configfile_updateOptions():
+    ConfigFile.updateOptions()
 
 
 def insertInto():
-    anvizRegs = AnvizRegisters()
 
-    pprint(anvizRegs.insertInto("WorkDays", *(
+    pprint(anvRgs.insertInto("WorkDays", *(
         QtCore.QDate(dt.date(2014, 9, 2)),
         '10',
         None,
@@ -544,25 +549,31 @@ def insertInto():
         None,
         4
     )))
-    anvizRegs.db.close()
-    sys.exit()
+
 
 def deleteDay(day):
-    anvRgs = AnvizRegisters()
     anvRgs.deleteDay(day)
 
 
 def dates():
-    anvizRegs = AnvizRegisters()
-    print(anvizRegs.max_date_of("WorkDays"))
-    sys.exit()
+    print(anvRgs.max_date_of("WorkDays"))
+
+
+def addColumn():
+    print(anvRgs.addColumn("Userinfo", "isActive", bool))
 
 
 if __name__ == "__main__":
     from PyQt4 import QtGui
     from pprint import pprint
     app = QtGui.QApplication(sys.argv)
+
+    configfile_updateOptions()
+
     # setDatabasePath()
+
+    anvRgs = AnvizRegisters()
+
     # setSetupPath()
     # getShcedulesDetails()
     # getWorkers()
@@ -571,5 +582,7 @@ if __name__ == "__main__":
     # genericTest()
     # insertInto()
     # dates()
-    deleteDay(dt.datetime.today().date())
-    app.exec()
+    # deleteDay(dt.datetime.today().date())
+    addColumn()
+    anvRgs.db.close()
+    sys.exit(app.closeAllWindows())

@@ -52,14 +52,13 @@ class AnvizReader:
 
     @property
     def workers_shifts(self):
-        return self.anvRgs.getWorkers('shifts')
+        return self.anvRgs.getWorkers('shifts by name')
 
     def updateTable(self):
         from_date = self.anvRgs.max_date_of("WorkDays")
 
         if from_date is None:
             from_date = self.anvRgs.min_date_of("Checkinout")
-            search_operator = '>='
         else:
             self.anvRgs.deleteDay(from_date)
 
@@ -83,7 +82,6 @@ class AnvizReader:
         CheckDate = self.anvRgs.value(CHECKTIME).toPyDateTime().date()
 
         workdays = []
-
         for d in dates_range:
             # WorkDay day template
             workday = self.workdayTemplate(d)
@@ -169,31 +167,26 @@ class AnvizReader:
 
 
 def update():
-    reader = AnvizReader()
     reader.updateTable()
-    sys.exit()
 
 
 def tests():
-    reader = AnvizReader()
     pprint(reader.schedules_map)
-    sys.exit()
+
+
+def getShifts():
+    print(reader.schedules)
 
 
 def run():
-    reader = AnvizReader()
     pprint(reader.workers_names)
-    sys.exit()
-
-
-def maptest():
-    reader = AnvizReader()
-    sys.exit()
 
 if __name__ == "__main__":    # run()
     from pprint import pprint
     app = QtGui.QApplication(sys.argv)
 
-    update()
-    sys.exit(app.exec())
+    reader = AnvizReader()
+    getShifts()
+    # update()
+    sys.exit()
 

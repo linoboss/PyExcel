@@ -14,18 +14,22 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.file_name = ''
+        # self.database_path = QtGui.QLabel()
+        self.database_path.setText(
+            sql.ConfigFile.get("database_path")
+        )
 
     @pyqtSlot()
     def on_changeDB_clicked(self):
-        self.file_name = \
+        filename = \
             QtGui.QFileDialog.getOpenFileName(
                 self, "Seleccionar archivo Access")
 
-        if self.file_name is not None:
-            sql.ConfigFile().setDatabasePath(
-                self.file_name
+        if filename is not None:
+            sql.ConfigFile().set(
+                "database_path", filename
             )
+            self.database_path.setText(filename)
 
     @pyqtSlot()
     def on_init_clicked(self):

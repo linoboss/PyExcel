@@ -1,113 +1,54 @@
 import sys, os
 from PyQt4 import QtGui, QtCore
-from mainview_controller import MainView
 import assets.sql as sql
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No
 
 
-class Start:
-    def __init__(self):
-        self.app = QtGui.QApplication(sys.argv)
-
-    def program(self):
-        start_dialog = QtGui.QDialog()
-        start_dialog.resize(500, 400)
-        start_dialog.setWindowFlags(QtCore.Qt.CustomizeWindowHint)
-        verticalLayout = QtGui.QVBoxLayout(start_dialog)
-        init_label = QtGui.QLabel("Iniciando el programa")
-        verticalLayout.addWidget(init_label)
-
-        # Revision de elementos críticos para el funcionamiento
-        # del programa
-
-        # Buscar archivo shelve de configuracion
-        if sql.ConfigFile.exist():
-            text = "Archivo de configuracion encontrado"
-        else:
-            text = "Archivo de configuracion creado"
-            sql.ConfigFile.create()
-
-        verticalLayout.addWidget(QtGui.QLabel(
-                text))
-
-        # buscar archivo de la base de datos
-        if os.path.exists(
-                sql.ConfigFile.getDatabasePath()):
-            text = "Base de datos encontrada"
-        else:
-            if self.ask_user_to("search db") == YES:
-                self.search_db_file()
-            else:
-                self.close()
-
-            text = "Base de datos seleccionada"
-
-        verticalLayout.addWidget(QtGui.QLabel(
-                text))
-
-        # conectar con la base de datos
-        try:
-            anvRgs = sql.AnvizRegisters()
-        except ConnectionError:
-            if self.ask_user_to('search db', 'invalid') == YES:
-                self.search_db_file()
-            else:
-                self.close()
-
-        # revisar la existencia de la tabla WorkDays
-        if anvRgs.tableExists("WorkDays"):
-            text = "Tabla WorkDays existente"
-        else:
-            anvRgs.createTable("WorkDays")
-            text = "Tabla WorkDays creada"
-        anvRgs.disconnect()
-
-        mainview = MainView()
-
-        start_dialog.close()
-
-        mainview.show()
-        sys.exit(self.app.exec())
-
+class PopUps:
     @staticmethod
-    def ask_user_to(option, sub=None):
+    def ask_user_to(text, infotext='', detailedtext=''):
         messageBox = QtGui.QMessageBox()
         messageBox.setStandardButtons(QtGui.QMessageBox.Yes |
                                       QtGui.QMessageBox.No)
         messageBox.setIcon(QtGui.QMessageBox.Question)
-
-        if option == "search db":
-            if sub is None:
-                messageBox.setText("La base de datos no fue encontrada...")
-            elif sub == "invalid":
-                messageBox.setText("La base de datos encontrada es invalida...")
-
-            messageBox.setInformativeText("Desea buscarla?")
-            messageBox.setDetailedText("Probablemente se encuentre en"
-                                       " la direccion:\n C:\\standard")
-        elif option == "reselect":
-            messageBox.setText("Desea intentar de nuevo?")
-
+        messageBox.setText(text)
+        messageBox.setInformativeText(infotext)
+        messageBox.setDetailedText(detailedtext)
         return messageBox.exec()
 
-    def close(self):
-        self.app.closeAllWindows()
-        sys.exit()
+    @staticmethod
+    def inform_user(text):
+        messageBox = QtGui.QMessageBox()
+        messageBox.setText(text)
+        messageBox.setStandardButtons(QtGui.QMessageBox.Ok)
+        messageBox.setIcon(QtGui.QMessageBox.Information)
 
-    def search_db_file(self):
-        file_name = ''
+    @staticmethod
+    def search_file(text, initial_path, target, action='get'):
+        if target == 'database':
+            filter_ = "Access db (*.mdb)"
+        elif target == 'pdf':
+            filter_ = "pdf (*.pdf)"
+        else:
+            filter_ = '*'
+        filename = initial_path
         while True:
-            file_name = QtGui.QFileDialog.getOpenFileName(
-                None, "Seleccionar archivo Access", "C:\\", "Access db (*.mdb)")
-            file_name = file_name.replace('/', '\\')
-            if file_name:
-                sql.ConfigFile.setDatabasePath(file_name)
+            if action == 'get':
+                filename = QtGui.QFileDialog.getOpenFileName(
+                    None, text, initial_path, filter_)
+            elif action == 'save':
+                filename = QtGui.QFileDialog.getSaveFileName(
+                    None, text, initial_path, filter_)
+            filename = filename.replace('/', '\\')
+            if filename:
                 break
-            if self.ask_user_to("reselect") == NO:
-                self.close()
-        return file_name
+            if PopUps.ask_user_to('Intentar nuevamente?') == NO:
+                return ''
+
+        return filename
+
 
 if __name__ == "__main__":
-    Start()
+    pass

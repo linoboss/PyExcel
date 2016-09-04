@@ -140,6 +140,36 @@ class CalculusModel(QtGui.QIdentityProxyModel):
     def rowCount(self, QModelIndex_parent=None, *args, **kwargs):
         return self.sourceModel().rowCount()
 
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+        if role == Qt.TextAlignmentRole:
+            if orientation == Qt.Horizontal:
+                return Qt.AlignVCenter |\
+                       Qt.AlignHCenter
+        if role != Qt.DisplayRole:
+            return None
+        if orientation == Qt.Horizontal:
+            if section == DAY:
+                return "Dia"
+            elif section == WORKER:
+                return "Trabajador"
+            elif (section == INTIME_1 or
+                  section == INTIME_2 or
+                  section == INTIME_3):
+                return "Entrada"
+            elif (section == OUTTIME_1 or
+                  section == OUTTIME_2 or
+                  section == OUTTIME_3):
+                return "Salida"
+            elif section == SHIFT:
+                return "Turno"
+            elif section == WORKED_TIME:
+                return "Tiempo\nTrabajado"
+            elif section == EXTRA_TIME:
+                return "Tiempo\nExtra"
+            elif section == ABSENT_TIME:
+                return "Tiempo\nAusente"
+        return str(section)
+
     def data(self, index, role=None):
         row = index.row()
         column = index.column()
@@ -147,9 +177,9 @@ class CalculusModel(QtGui.QIdentityProxyModel):
             return None
         item = self.sourceModel().data(self.sourceModel().index(row, column))
 
-        if role == QtCore.Qt.EditRole:
+        if role == Qt.EditRole:
             return None
-        elif role == QtCore.Qt.DisplayRole:
+        elif role == Qt.DisplayRole:
             if column == DAY:
                 return item
             elif column >= WORKED_TIME:
@@ -169,7 +199,7 @@ class CalculusModel(QtGui.QIdentityProxyModel):
         return item
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def calculateWorkedHours(self):
         self.beginInsertColumns(QtCore.QModelIndex(), 10, 13)

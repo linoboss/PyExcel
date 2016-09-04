@@ -5,6 +5,9 @@ from PyQt4 import QtCore, QtGui, QtSql
 from assets.anviz_reader import AnvizReader
 import assets.work_day_tools as tool
 import assets.dates_tricks as md
+import assets.sql as sql
+import assets.helpers as helpers
+import configview_controller
 
 
 qtCreatorFile = "ui\\MainView.ui"
@@ -20,12 +23,14 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setGeometry(100, 100, 1200, 600)
+        self.showMaximized()
         self.stackedWidget.setCurrentIndex(0)
 
-        self.anvReader = AnvizReader()
+        self.initProcedure()
 
-        self.anvReader.updateTable()
+        self.anvReader = self.conectToDatabase()
+
+        # setting the models and filters
 
         self.model = QtSql.QSqlRelationalTableModel(self)
         self.model.setTable('WorkDays')
@@ -63,20 +68,19 @@ class MainView(Ui_MainWindow, QtBaseClass):
         printFilter = tool.DateFilterProxyModel()
         printFilter.setSourceModel(scheduleFilter)
 
-        # self.qtable = QtGui.QTableView()
+        # configuring the table
         self.qtable.setModel(printFilter)
         self.qtable.setItemDelegate(tool.WorkDayDelegate(self))
         for column in (0, 7, 8): self.qtable.setColumnHidden(column, True)
         self.qtable.resizeColumnsToContents()
         self.qtable.setSortingEnabled(False)
 
-        # self.qworkers = QtGui.QComboBox()
+        # setting the initial values of the comboboxes
         self.qworkers.addItems(
             ["Todos"] + self.anvReader.workers_names)
         self.qdatesfilter.setCurrentIndex(0)
         self.qdate.setDate(QtCore.QDate().currentDate())
 
-        # self.qschedules = QtGui.QComboBox()
         self.qschedules.addItems(
             ["Todos"] + self.anvReader.schedules)
         self.qdatesfilter.setCurrentIndex(0)
@@ -85,6 +89,12 @@ class MainView(Ui_MainWindow, QtBaseClass):
         # mostrar todos los registros al inicio
         self.nameFilter.setFilterRegExp('.*')
         self.dateFilter.removeFilter()
+
+    @QtCore.pyqtSlot("QAction*")
+    def on_menubar_triggered(self, action):
+        if action is self.action_data_base:
+            configview = configview_controller.ScheduleConfiguration_Controller()
+            configview.exec()
 
     @QtCore.pyqtSlot("QString")
     def on_qworkers_currentIndexChanged(self, text):
@@ -112,6 +122,16 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qprint_clicked(self):
+
+        filename = helpers.PopUps.search_file(
+            'Donde desea ubicar el archivo?',
+            sql.ConfigFile.get('print_path'),
+            'pdf',
+            'save')
+        if filename == '':
+            helpers.PopUps.inform_user("No se creo el documento")
+            return
+
         self.qprint.setDisabled(True)
         scheduleFilter = QtGui.QSortFilterProxyModel(self)
         scheduleFilter.setSourceModel(self.dateFilter)
@@ -204,7 +224,10 @@ class MainView(Ui_MainWindow, QtBaseClass):
         printer = QtGui.QPrinter()
         dpi = 96
         printer.setResolution(dpi)
-        printer.setOutputFileName("foo.pdf")
+
+        printer.setOutputFileName(filename)
+        sql.ConfigFile.set('print_path',
+                           str.join('\\', filename.split('\\')[:-1]))
         printer.setPageSize(QtGui.QPrinter.Letter)
         printer.setOrientation(QtGui.QPrinter.Landscape)
         printer.setOutputFormat(QtGui.QPrinter.PdfFormat)
@@ -225,6 +248,42 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def on_qdatesrangebutton_clicked(self):
         self.dateFilter.setRangeDateFilter(self.qfromdate.date(),
                                            self.qtodate.date())
+
+    @staticmethod
+    def closeProgram():
+        app = QtGui.QApplication.instance()
+        app.closeAllWindows()
+        sys.exit()
+
+    def initProcedure(self):
+        pass
+
+    def conectToDatabase(self):
+
+        initial_path = sql.ConfigFile.get("database_path")
+        try:
+            anvizReader = AnvizReader()
+        except ConnectionError:
+            if helpers.PopUps.ask_user_to('Error en la base de datos, desea ubicar '
+                                          'una base de datos valida?') == QtGui.QMessageBox.Yes:
+                sql.ConfigFile.set('database_path',
+                                   helpers.PopUps.search_file("Seleccione una base de datos valida",
+                                                              initial_path,
+                                                              "database"))
+                self.conectToDatabase()
+            else:
+                self.closeProgram()
+        try:
+            # TODO if by any reason the database is not correctly configured, load an empy model
+            anvizReader.updateTable()
+        except TypeError:
+            if (helpers.PopUps.ask_user_to("El archivo de la base de datos esta incompleto",
+                                           "Desea buscar un archivo distinto?")
+                    == QtGui.QMessageBox.YES):
+                self.conectToDatabase()
+            else:
+                self.closeProgram()
+        return anvizReader
 
 
 if __name__ == "__main__":

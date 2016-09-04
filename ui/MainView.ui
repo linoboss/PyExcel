@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1252</width>
+    <width>627</width>
     <height>531</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
          <widget class="QTableView" name="qtable">
           <property name="minimumSize">
            <size>
-            <width>800</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
@@ -249,20 +249,20 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1252</width>
+     <width>627</width>
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuConfiguracion">
+   <widget class="QMenu" name="menuConfiguration">
     <property name="title">
      <string>Configuracion</string>
     </property>
-    <addaction name="actionBase_de_datos"/>
+    <addaction name="action_data_base"/>
    </widget>
-   <addaction name="menuConfiguracion"/>
+   <addaction name="menuConfiguration"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionBase_de_datos">
+  <action name="action_data_base">
    <property name="text">
     <string>Base de datos</string>
    </property>
@@ -277,12 +277,12 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1116</x>
-     <y>145</y>
+     <x>606</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1233</x>
-     <y>182</y>
+     <x>606</x>
+     <y>272</y>
     </hint>
    </hints>
   </connection>
