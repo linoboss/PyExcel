@@ -24,7 +24,7 @@ class Start:
 
         # buscar archivo de la base de datos
         if os.path.exists(
-                sql.ConfigFile.getDatabasePath()):
+                sql.ConfigFile.get("database_path")):
             text = "Base de datos encontrada"
         else:
             if self.ask_user_to("search db") == YES:

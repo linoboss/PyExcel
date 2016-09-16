@@ -46,6 +46,11 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
         painter.restore()
 
     def sizeHint(self, option, index):
+        column = index.column()
+        if column == DAY:
+            return QtCore.QSize(180, 20)
+        elif column == WORKER:
+            return QtCore.QSize(150, 20)
         return QtCore.QSize(100, 20)
 
     """

@@ -220,7 +220,6 @@ class AnvizRegisters:
                                "WHERE Userid=:id")
             self.query.bindValue(":id", args[0])
             self.query.exec_()
-            print(self.query.lastQuery())
         return self.howthequerydid()
 
     def randomLoad(self, name):
@@ -515,7 +514,7 @@ class AnvizRegisters:
 
     def disconnect(self):
         self.db.close()
-        QtSql.QSqlDatabase.removeDatabase()
+        QtSql.QSqlDatabase.removeDatabase("QODBC")
         del self.db
 
 # *** TESTS ***

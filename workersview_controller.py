@@ -45,6 +45,12 @@ class Workerswiev_controller(Ui_MainWindow, QtBaseClass):
         awv_c = AddWorkerView_controller(self)
         awv_c.exec()
 
+    @QtCore.pyqtSlot()
+    def on_qdelete_clicked(self):
+        from deleteworkerview_controller import DeleteWorkerView_controller
+        dwv_c = DeleteWorkerView_controller(self)
+        dwv_c.exec()
+
 
 class CustomDelegate(QtGui.QStyledItemDelegate):
     def __init__(self, parent = None):
