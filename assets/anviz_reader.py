@@ -34,7 +34,7 @@ class AnvizReader:
         self.schedules_map = self.anvRgs.schedules_map()
         self.schedules = list(map(lambda x: str(x.name), self.schedules_map.keys()))
         self.workers_by_id = self.anvRgs.getWorkers("byId")
-        self.workers_shift = self.anvRgs.getWorkers("shifts by id")
+        self.workers_shifts_id = self.anvRgs.getWorkers("shifts by id")
 
         self.exeptions = []  # list of indexes of Checkinout logs that failed the validation
 
@@ -54,13 +54,17 @@ class AnvizReader:
     def workers_shifts(self):
         return self.anvRgs.getWorkers('shifts by name')
 
+    def workers_shift_by(self, option):
+        if option == "id":
+            return self.anvRgs.getWorkers("shifts by id")
+
     def updateTable(self):
         from_date = self.anvRgs.max_date_of("WorkDays")
 
         if from_date is None:
             from_date = self.anvRgs.min_date_of("Checkinout")
-        else:
-            self.anvRgs.deleteDay(from_date)
+
+        print(QtCore.QDate(from_date), self.anvRgs.deleteDay(from_date))
 
         to_date = self.anvRgs.max_date_of("Checkinout")
         """
@@ -99,7 +103,7 @@ class AnvizReader:
                     else:
                         self.exeptions.append(logid)
 
-                    workday[userid][8] = self.workers_shift[userid]
+                    workday[userid][8] = self.workers_shifts_id[userid]
 
                 # user defines the schedule, while the checktime defines the shift
                 # go to the next register
@@ -111,10 +115,21 @@ class AnvizReader:
         """
         Una vez analizados todos los registros, estos seran almacenados en la tabla
         """
+        overnight_workers = self.overnightWorkers()
+
+        out_aux = [None, None]
+        for workday in workdays[::-1]:
+            for w in overnight_workers:
+                out = [workday[w][3], workday[w][5]]
+                workday[w][3], workday[w][5] = out_aux
+                out_aux = out
 
         for workday in workdays:
             for w, register in sorted(workday.items()):
                 self.anvRgs.insertInto("WorkDays", *register)
+
+    def map_to_schedules(self, userid, checktime):
+        return self.__map_to_schedules(userid, checktime)
 
     def __map_to_schedules(self, userid, checktime):
         """
@@ -128,7 +143,7 @@ class AnvizReader:
         """
         coords = 0
         # determine CheckTime Shift
-        schedule = self.workers_shift[userid]
+        schedule = self.workers_shifts_id[userid]
         log = checktime.toPyDateTime().time()
         i = 0
         for id_, details in self.schedules_details[schedule].items():
@@ -158,10 +173,18 @@ class AnvizReader:
         day = QtCore.QDate(day)
         wd_temp = {}
         for w in self.workers_by_id:
+            SHIFT = self.workers_shifts_id[w]
             wd_temp[w] = [day, str(w), INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3, SHIFT]
 
         return wd_temp
 
+    def overnightWorkers(self):
+        overnight_workers = []
+        overnight_map = self.anvRgs.schedules_overnight_map()
+        for w, shift in self.workers_shift_by('id').items():
+            if overnight_map[shift]:
+                overnight_workers.append(w)
+        return overnight_workers
 
 # *** Tests ***
 
@@ -186,7 +209,7 @@ if __name__ == "__main__":    # run()
     app = QtGui.QApplication(sys.argv)
 
     reader = AnvizReader()
-    getShifts()
-    # update()
+    # getShifts()
+    update()
     sys.exit()
 

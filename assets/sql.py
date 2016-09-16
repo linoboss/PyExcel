@@ -1,10 +1,8 @@
-# https://code.google.com/p/pyodbc/wiki/Cursor
 import sys, os
 import datetime as dt
 import shelve
 from PyQt4 import QtSql
 from PyQt4 import QtCore
-from assets.dates_tricks import MyDates as md
 
 global_var = globals()
 base_directory = os.getcwd()
@@ -14,8 +12,6 @@ while aux[-1] != 'PyExcel':
     aux = aux[:-1]
 base_directory = str.join('\\', aux)
 global_var['CONFIG_FILE'] = base_directory + '\\persistence\\config'
-if __name__ == '__main__':
-    global_var['CONFIG_FILE'] = '\\'.join(base_directory.split('\\')[:-1]) + '\\persistence\\config'
 
 
 class ConfigFile:
@@ -104,11 +100,13 @@ class SchMapping:
 class AnvizRegisters:
     def __init__(self):
         # *** Variable declaration ***
-        self.db = None
-        self.query = None
+        self.db = QtSql.QSqlDatabase.database()
 
         # *** init actions ***
-        self.__connect()
+        if not self.db.open():
+            self.__connect()
+
+        self.query = QtSql.QSqlQuery()
 
     def __connect(self):
 
@@ -122,8 +120,6 @@ class AnvizRegisters:
         if not self.db.open():
             raise ConnectionError("UNABLE TO CONECT TO THE DATABASE IN " +
                                   MDB)
-
-        self.query = QtSql.QSqlQuery()
 
     def tableExists(self, name):
         return name in self.db.tables()
@@ -180,14 +176,11 @@ class AnvizRegisters:
 
     def addColumn(self, table, name, type_):
         self.query = QtSql.QSqlQuery()
-        print(self.query.lastQuery())
-        self.query.prepare("ALTER TABLE :table "
-                           "ADD COLUMN :name :type")
-        self.query.bindValue(":table", table)
-        self.query.bindValue(":name", name)
-        if type_ is bool: type_ = "INTEGER"
-        self.query.bindValue(":type", type_)
-        self.query.exec_()
+        if type_ is bool: type_ = "BIT"
+        self.query.exec("ALTER TABLE {table} "
+                        "ADD COLUMN {name} {type}".format(table=table,
+                                                          name=name,
+                                                          type=type_))
         return self.howthequerydid()
 
     def insertInto(self, table, *args):
@@ -200,11 +193,34 @@ class AnvizRegisters:
                 self.query.bindValue(i, value)
             self.query.exec_()
 
+        elif table == "Userinfo":
+            self.query.prepare("INSERT INTO Userinfo ("
+                               "    Userid, Name, Sex, isActive) "
+                               "VALUES (:id, :name, :sex, :isActive)")
+            self.query.bindValue(":id", args[0])
+            self.query.bindValue(":name", args[1])
+            self.query.bindValue(":sex", args[2])
+            self.query.bindValue(":isActive", args[3])
+            self.query.exec_()
+
     def deleteDay(self, day):
         self.query.prepare("DELETE FROM WorkDays "
                            "WHERE day=:day")
-        self.query.bindValue("day", QtCore.QDate(day))
+        self.query.bindValue(":day", QtCore.QDate(day))
         self.query.exec_()
+        return self.howthequerydid()
+
+    def deleteRegistersFrom(self, table):
+        self.query.exec("DELETE FROM {}".format(table))
+        return self.howthequerydid()
+
+    def deleteRegister(self, table, *args):
+        if table == "Userinfo":
+            self.query.prepare("DELETE FROM Userinfo "
+                               "WHERE Userid=:id")
+            self.query.bindValue(":id", args[0])
+            self.query.exec_()
+            print(self.query.lastQuery())
         return self.howthequerydid()
 
     def randomLoad(self, name):
@@ -240,7 +256,8 @@ class AnvizRegisters:
                             "       ON (b.Schid = c.Schid)")
         elif option == "byId":
             self.query.exec(
-                "SELECT DISTINCT c.Schid, a.Timeid, Intime, Outtime, BIntime, EIntime, BOuttime, EOuttime "
+                "SELECT DISTINCT c.Schid, a.Timeid, "
+                "                Intime, Outtime, BIntime, EIntime, BOuttime, EOuttime "
                 "FROM ("
                 "   TimeTable a "
                 "   INNER JOIN "
@@ -263,6 +280,13 @@ class AnvizRegisters:
             shift_details[shift][schedule] = [self.query.value(i) for i in range(2, 8)]
 
         return shift_details
+
+    def schedules_overnight_map(self):
+        overnight_map = {}
+        self.query.exec("SELECT Schid, isOvernight FROM Schedule")
+        while self.query.next():
+            overnight_map[self.query.value(0)] = self.query.value(1) > 0
+        return overnight_map
 
     def schedules_map(self):
         """
@@ -561,6 +585,7 @@ def dates():
 
 def addColumn():
     print(anvRgs.addColumn("Userinfo", "isActive", bool))
+    print(anvRgs.query.lastQuery())
 
 
 if __name__ == "__main__":
@@ -568,7 +593,7 @@ if __name__ == "__main__":
     from pprint import pprint
     app = QtGui.QApplication(sys.argv)
 
-    configfile_updateOptions()
+    # configfile_updateOptions()
 
     # setDatabasePath()
 

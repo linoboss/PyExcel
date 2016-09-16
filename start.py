@@ -1,8 +1,7 @@
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 from mainview_controller import MainView
 import assets.sql as sql
-import time
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No

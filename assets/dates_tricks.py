@@ -79,6 +79,15 @@ class MyDates:
     def next_day(d):
         return d + relativedelta(days=1)
 
+    @staticmethod
+    def dateToString(d, option='default'):
+        if option == 'default':
+            return '{}, {} de {} de {}'.format(
+                MyDates.dayName(d),
+                d.day, MyDates.monthName(d.month),
+                d.year
+            )
+
 # **TESTS**
 
 
@@ -90,4 +99,5 @@ def dates_range():
 
 if __name__ == "__main__":
     from pprint import pprint
-    dates_range()
+
+    print(MyDates.dateToString(dt.datetime.now().date()))

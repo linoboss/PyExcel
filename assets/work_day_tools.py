@@ -1,7 +1,8 @@
 import sys
 from PyQt4 import uic
 from PyQt4.QtCore import Qt
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, QtSql
+from assets.dates_tricks import MyDates as md
 
 (ID, DAY, WORKER,
  INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3,
@@ -20,11 +21,10 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
         color = QtGui.QColor(255, 255, 255)
         if column == DAY:
             if item.date().day() % 2 == 0:
-
                 color = QtGui.QColor(200, 200, 255)
             else:
                 color = QtGui.QColor(200, 255, 200)
-            text = item.toString("yyyy-MM-dd")
+            text = md.dateToString(item.toPyDateTime().date())
 
         elif column == WORKER:
             text = str(item)
@@ -44,12 +44,6 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
         document.setHtml(text)
         document.drawContents(painter)
         painter.restore()
-
-    def setEditorData(self, editor, index):
-        pass
-
-    def createEditor(self, parent, option, index):
-        pass
 
     def sizeHint(self, option, index):
         return QtCore.QSize(100, 20)
@@ -230,5 +224,4 @@ class CalculusModel(QtGui.QIdentityProxyModel):
                 [worked_time, extra_time, absent_time]
             )
         self.emit(QtCore.SIGNAL("dataChanged()"), self)
-
 

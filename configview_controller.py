@@ -1,15 +1,15 @@
 import sys
 from PyQt4 import uic
-from PyQt4 import QtSql, QtCore, QtGui
-from PyQt4.QtCore import SIGNAL, Qt, pyqtSlot
+from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSlot
 import assets.sql as sql
+import assets.helpers as helpers
 
 # Uic Loader
 qtCreatorFile = "ui\\config_dialog.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
 
 
-# TODO add to the program my own Schedule Configuration interface, for now, i'll work with the default
 class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
     def __init__(self):
         super().__init__()
@@ -34,6 +34,7 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
     @pyqtSlot()
     def on_init_clicked(self):
         if self.confirmar():
+            helpers.PopUps.inform_user("Action not yet implemented!")
             pass
         else:
             return
@@ -41,14 +42,14 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
     @pyqtSlot()
     def on_erase_clicked(self):
         if self.confirmar():
-            print('si')
+            helpers.PopUps.inform_user("Action not yet implemented!")
         else:
             return
 
     @pyqtSlot()
     def on_eraseDay_clicked(self):
         if self.confirmar():
-            print('si')
+            helpers.PopUps.inform_user("Action not yet implemented!")
         else:
             return
 

@@ -78,13 +78,14 @@ class MainView(Ui_MainWindow, QtBaseClass):
         # setting the initial values of the comboboxes
         self.qworkers.addItems(
             ["Todos"] + self.anvReader.workers_names)
-        self.qdatesfilter.setCurrentIndex(0)
-        self.qdate.setDate(QtCore.QDate().currentDate())
-
         self.qschedules.addItems(
             ["Todos"] + self.anvReader.schedules)
         self.qdatesfilter.setCurrentIndex(0)
+
+        # setting the initial values of the filters
         self.qdate.setDate(QtCore.QDate().currentDate())
+        self.qtodate.setDate(QtCore.QDate().currentDate())
+        self.qfromdate.setDate(QtCore.QDate().currentDate())
 
         # mostrar todos los registros al inicio
         self.nameFilter.setFilterRegExp('.*')
@@ -92,9 +93,19 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot("QAction*")
     def on_menubar_triggered(self, action):
-        if action is self.action_data_base:
+        if action is self.action_database:
             configview = configview_controller.ScheduleConfiguration_Controller()
             configview.exec()
+        elif action is self.action_registers:
+            from checkinoutview_controller import Checkinoutview_Controller
+            checkioview = Checkinoutview_Controller(self)
+            checkioview.exec()
+        elif action is self.action_schedules:
+            from schedulesview_controller import  Schedulesview_Controller
+            schview = Schedulesview_Controller(self)
+            schview.exec()
+        else:
+            helpers.PopUps.inform_user("not implemented!")
 
     @QtCore.pyqtSlot("QString")
     def on_qworkers_currentIndexChanged(self, text):
@@ -171,7 +182,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
                                                          md.MyDates.monthName(date.month),
                                                          date.year))
             for sch in self.anvReader.schedules:
-                if sch.lower() == 'nocturno': continue
+                # if sch.lower() == 'nocturno': continue
                 scheduleFilter.setFilterRegExp(sch)
                 if printFilter.rowCount() == 0: continue
                 html += "Horario {}".format(sch)
