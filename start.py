@@ -87,7 +87,7 @@ class Start:
                 None, "Seleccionar archivo Access", "C:\\", "Access db (*.mdb)")
             file_name = file_name.replace('/', '\\')
             if file_name:
-                sql.ConfigFile.setDatabasePath(file_name)
+                sql.ConfigFile.set("database_path", file_name)
                 break
             if self.ask_user_to("reselect") == NO:
                 self.close()

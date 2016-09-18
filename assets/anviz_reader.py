@@ -64,9 +64,10 @@ class AnvizReader:
         if from_date is None:
             from_date = self.anvRgs.min_date_of("Checkinout")
 
-        print(QtCore.QDate(from_date), self.anvRgs.deleteDay(from_date))
+        self.anvRgs.deleteDay(from_date)
 
         to_date = self.anvRgs.max_date_of("Checkinout")
+        print(to_date)
         """
         Iterate over dates
         """

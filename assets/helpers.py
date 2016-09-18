@@ -47,6 +47,9 @@ class PopUps:
             if PopUps.ask_user_to('Intentar nuevamente?') == NO:
                 return ''
 
+        if filename.split('.')[-1] != 'pdf':
+            filename += '.pdf'
+
         return filename
 
 

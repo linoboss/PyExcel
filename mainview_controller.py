@@ -255,6 +255,9 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
         self.qprint.setDisabled(False)
 
+        from assets.helpers import PopUps
+        PopUps.inform_user("El documento fue creado exitosamente")
+
     @QtCore.pyqtSlot()
     def on_qdatesrangebutton_clicked(self):
         self.dateFilter.setRangeDateFilter(self.qfromdate.date(),
