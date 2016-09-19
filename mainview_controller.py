@@ -172,7 +172,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
             html += ("<html>"
                      "<body>"
                      "<table><tr>"
-                     "<td><img src='C:\\workspace\\PyExcel\\images\\SGlogo.png'></td>"
+                     # "<td><img src='C:\\ControlHorario\\PyExcel\\images\\SGlogo.png'></td>"
                      "<td align=right valign=bottom style='padding-left:450px'>"
                      "<div style='font-size:25px'><b>ASISTENCIAS<br>DIARIAS</b></div></td>"
                      "</tr></table><br><hr>")
