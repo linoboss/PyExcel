@@ -1,5 +1,5 @@
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore, QtSql
 import assets.sql as sql
 
 YES = QtGui.QMessageBox.Yes
@@ -53,5 +53,24 @@ class PopUps:
         return filename
 
 
+class Db:
+    @staticmethod
+    def tableHeader(table):
+        model = QtSql.QSqlTableModel()
+        model.setTable(table)
+        model.select()
+
+        from collections import OrderedDict
+        headerMap = OrderedDict()
+        for i in range(model.columnCount()):
+            headerMap[model.headerData(i, QtCore.Qt.Horizontal,
+                                       QtCore.Qt.DisplayRole).lower()] = i
+        return headerMap
+
+
 if __name__ == "__main__":
-    pass
+    import assets.anviz_reader as av
+
+    app = QtGui.QApplication(sys.argv)
+    av.AnvizReader()
+    print(Db.tableHeader('WorkDays'))

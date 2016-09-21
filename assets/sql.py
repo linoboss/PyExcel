@@ -98,20 +98,20 @@ class SchMapping:
 
 
 class AnvizRegisters:
-    def __init__(self):
+    def __init__(self, database_path=None):
         # *** Variable declaration ***
         self.db = QtSql.QSqlDatabase.database()
 
         # *** init actions ***
         if not self.db.open():
-            self.__connect()
+            self.connect(database_path)
 
         self.query = QtSql.QSqlQuery()
 
-    def __connect(self):
+    def connect(self, dbp):
 
         self.db = QtSql.QSqlDatabase.addDatabase("QODBC")
-        MDB = ConfigFile.get("database_path")
+        MDB = ConfigFile.get("database_path") if not dbp else dbp
         DRV = '{Microsoft Access Driver (*.mdb)}'
         PWD = 'pw'
 
@@ -369,7 +369,6 @@ class AnvizRegisters:
                             "   Schedule c "
                             "       ON (b.Schid = c.Schid) " +
                             ifActive)
-            print(self.howthequerydid())
             while self.query.next():
                 name = self.query.value(0)
                 sch = self.query.value(1).lower()
@@ -516,6 +515,7 @@ class AnvizRegisters:
         self.db.close()
         QtSql.QSqlDatabase.removeDatabase("QODBC")
         del self.db
+
 
 # *** TESTS ***
 

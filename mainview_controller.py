@@ -8,6 +8,7 @@ import assets.dates_tricks as md
 import assets.sql as sql
 import assets.helpers as helpers
 import configview_controller
+from assets.namespace import WorkDayTable as WDT
 
 
 qtCreatorFile = "ui\\MainView.ui"

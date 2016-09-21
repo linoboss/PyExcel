@@ -54,18 +54,18 @@ class LearningSqlModel(Ui_MainWindow, QtBaseClass):
         self.mapper.addMapping(self.id, ID)
         self.mapper.toFirst()
 
-        self.connect(self.btn_save, SIGNAL("clicked()"),
-                     self.saveRecord)
-
     def saveRecord(self):
         self.model.submitAll()
 
-
-
+    def getHorizontalHeaders(self):
+        headerData = [self.model.headerData(i, Qt.Horizontal, Qt.DisplayRole)
+                      for i in range(self.model.columnCount())]
+        return headerData
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = LearningSqlModel()
     window.show()
+    print(window.getHorizontalHeaders())
     sys.exit(app.exec())
 
