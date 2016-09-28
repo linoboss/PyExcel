@@ -12,6 +12,9 @@ WDH = helpers.Db.tableHeader('Workday')
 
 
 class PrintReport:
+    ACCEPTED = "accepted"
+    CANCELED = "canceled"
+
     def __init__(self, parent=None):
         self.sourceModel = None
         self.doc = QtGui.QTextDocument()
@@ -23,19 +26,19 @@ class PrintReport:
     def setSourceModel(self, sourceModel):
         self.sourceModel = sourceModel
 
-    def setOutputFileName(self):
+    def setOutputFileName(self, filename=None):
         filename = helpers.PopUps.search_file(
             'Donde desea ubicar el archivo?',
             sql.ConfigFile.get('print_path'),
             'pdf',
-            'save')
+            'save') if not filename else filename
         if filename == '':
-            return False
+            return self.ACCEPTED
         self.printer.setOutputFileName(filename)
         sql.ConfigFile.set('print_path',
                            str.join('\\', filename.split('\\')[:-1]))
         self.filename = filename
-        return True
+        return self.CANCELED
 
     def setup(self):
         dpi = 96
@@ -47,16 +50,16 @@ class PrintReport:
         font.setPointSize(12)
         self.doc.setDefaultFont(font)
 
-    def createFile(self, html):
+    def createFile(self):
         # printer.setPageMargins(30, 16, 12, 20, QtGui.QPrinter.Millimeter)
         self.doc.print_(self.printer)
-        self.doc.setHtml(html)
         self.doc.documentLayout().setPaintDevice(self.printer)
 
     def loadDocument(self):
         if self.filename == '':
             raise ValueError('Enter the filename before printing')
-            return
+        if self.sourceModel is None:
+            raise ValueError('Enter the sourceModel before printing')
 
         scheduleFilter = QtGui.QSortFilterProxyModel(self)
         scheduleFilter.setSourceModel(self.sourceModel)
@@ -146,15 +149,13 @@ class PrintReport:
                 html += "</table>"
 
             # html += "<br>"*6
-            #  html += "<hr width=300>"
-            #  html += "<p style='margin-left:380px;'>Revisado por</p>"
+            # html += "<hr width=300>"
+            # html += "<p style='margin-left:380px;'>Revisado por</p>"
             if date != to_date:
                 html += "<div style='page-break-before:always'></div>"
 
-        self.createFile(html)
-        QtGui.QApplication.processEvents()  # flushes the signal queue and prevents multiple clicks
+        self.doc.setHtml(html)
 
-        from assets.helpers import PopUps
-        PopUps.inform_user("El documento fue creado exitosamente")
-
-PrintReport()
+    def load_and_create_file(self):
+        self.loadDocument()
+        self.createFile()

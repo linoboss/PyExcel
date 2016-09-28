@@ -26,7 +26,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QTableView" name="qtable">
+         <widget class="QTableView" name="tableView">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -133,7 +133,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="noFilter"/>
            <widget class="QWidget" name="singleDate">
@@ -153,7 +153,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDateEdit" name="qdate"/>
+                  <widget class="QDateEdit" name="qdate">
+                   <property name="calendarPopup">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -184,7 +188,11 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QDateEdit" name="qfromdate"/>
+                  <widget class="QDateEdit" name="qfromdate">
+                   <property name="calendarPopup">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_2">
@@ -194,7 +202,11 @@
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QDateEdit" name="qtodate"/>
+                  <widget class="QDateEdit" name="qtodate">
+                   <property name="calendarPopup">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>

@@ -88,6 +88,14 @@ class MyDates:
                 d.year
             )
 
+    @staticmethod
+    def isValid(d):
+        if dt.MINYEAR < d.year < dt.MAXYEAR:
+            return True
+        else:
+            return False
+
+
 # **TESTS**
 
 

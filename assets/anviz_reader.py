@@ -6,7 +6,7 @@ from assets.sql import AnvizRegisters
 from assets.dates_tricks import MyDates as md
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-
+import assets.helpers as helpers
 
 schedules = ['Vespertino', 'Matutino', 'nocturno']
 work_time_reference = dt.timedelta(hours=8)
@@ -67,10 +67,12 @@ class AnvizReader:
         self.anvRgs.deleteDay(from_date)
 
         to_date = self.anvRgs.max_date_of("Checkinout")
-        print(to_date)
         """
         Iterate over dates
         """
+        if (md.isValid(to_date) is not True
+                or md.isValid(to_date) is not True):
+            return
         dates_range = md.dates_range(from_date.date(), to_date.date())
 
         self.anvRgs.query.exec("SELECT Logid, Userid, CheckTime "

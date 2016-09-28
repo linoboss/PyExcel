@@ -1,7 +1,8 @@
 import sys, os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtSql
 from mainview_controller import MainView
 import assets.sql as sql
+import assets.helpers as helpers
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No
@@ -12,8 +13,10 @@ class Start:
         self.app = QtGui.QApplication(sys.argv)
 
     def program(self):
-        # Revision de elementos críticos para el funcionamiento
-        # del programa
+        """
+        Revision de elementos críticos para el funcionamiento
+        del programa
+        """
 
         # Buscar archivo shelve de configuracion
         if sql.ConfigFile.exist():
@@ -48,6 +51,19 @@ class Start:
         else:
             anvRgs.createTable("WorkDays")
             text = "Tabla WorkDays creada"
+
+        # revisar que existan elementos en la tabla Checkinout
+        model = QtSql.QSqlTableModel()
+        model.setTable("Checkinout")
+        if model.rowCount() == 0:
+            helpers.PopUps.inform_user("No hay registros en la base de datos!")
+
+        # Agregar campos requeridos por el programa
+        if 'isActive' not in helpers.Db.tableHeader('Userinfo'):
+            anvRgs.addColumn('Userinfo', 'isActive', bool)
+        if 'isOvernight' not in helpers.Db.tableHeader('Schedule'):
+            anvRgs.addColumn('Schedule', 'isOvernight', bool)
+
         anvRgs.disconnect()
 
         mainview = MainView()

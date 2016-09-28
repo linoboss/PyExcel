@@ -104,11 +104,20 @@ class AnvizRegisters:
 
         # *** init actions ***
         if not self.db.open():
-            self.connect(database_path)
+            self.__connect(database_path)
 
         self.query = QtSql.QSqlQuery()
 
-    def connect(self, dbp):
+    def addColumn(self, table, name, type_):
+        self.query = QtSql.QSqlQuery()
+        if type_ is bool: type_ = "BIT"
+        self.query.exec("ALTER TABLE {table} "
+                        "ADD COLUMN {name} {type}".format(table=table,
+                                                          name=name,
+                                                          type=type_))
+        return self.howthequerydid()
+
+    def __connect(self, dbp=None):
 
         self.db = QtSql.QSqlDatabase.addDatabase("QODBC")
         MDB = ConfigFile.get("database_path") if not dbp else dbp
@@ -116,13 +125,9 @@ class AnvizRegisters:
         PWD = 'pw'
 
         self.db.setDatabaseName("DRIVER={};DBQ={};PWD={}".format(DRV, MDB, PWD))
-
         if not self.db.open():
             raise ConnectionError("UNABLE TO CONECT TO THE DATABASE IN " +
                                   MDB)
-
-    def tableExists(self, name):
-        return name in self.db.tables()
 
     def createTable(self, name):
         """
@@ -151,57 +156,16 @@ class AnvizRegisters:
             raise KeyError(name + ' is not a valid option')
         return self.howthequerydid()
 
-    def readTable(self, name,
-                  from_date=dt.datetime(1999, 1, 1),  # minimum valid date
-                  till_date=dt.datetime(2100, 1, 1)   # large valid date
-                  ):
-        """
+    def did_query_failed(self):
+        if self.query.lastError().number() == -1:
+            return False
+        else:
+            return True
 
-        Makes a READ query on the "name" table
-
-        :param name: indicates the table in which the query wants to be made
-        :param from_date: \ _  date filters, as most of the queries will be
-        :param till_date: /    bounded by a date range restrain
-        :return: a message with the result status of the query
-        """
-        if name == "Checkinout":
-            self.query.prepare("SELECT Logid, Userid, CheckTime, CheckType "
-                               "FROM Checkinout "
-                               "WHERE CheckTime >= :from_date AND CheckTime <= :till_date")
-            self.query.bindValue(":from_date", QtCore.QDateTime(from_date))
-            self.query.bindValue(":till_date", QtCore.QDateTime(till_date))
-            self.query.exec_()
-
-        return self.howthequerydid(name)
-
-    def addColumn(self, table, name, type_):
-        self.query = QtSql.QSqlQuery()
-        if type_ is bool: type_ = "BIT"
-        self.query.exec("ALTER TABLE {table} "
-                        "ADD COLUMN {name} {type}".format(table=table,
-                                                          name=name,
-                                                          type=type_))
-        return self.howthequerydid()
-
-    def insertInto(self, table, *args):
-        if table == "WorkDays":
-            self.query.prepare("INSERT INTO WorkDays ("
-                               "    day, worker, InTime_1, OutTime_1, InTime_2, "
-                               "    OutTime_2, InTime_3 , OutTime_3, shift) "
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
-            for i, value in enumerate(args):
-                self.query.bindValue(i, value)
-            self.query.exec_()
-
-        elif table == "Userinfo":
-            self.query.prepare("INSERT INTO Userinfo ("
-                               "    Userid, Name, Sex, isActive) "
-                               "VALUES (:id, :name, :sex, :isActive)")
-            self.query.bindValue(":id", args[0])
-            self.query.bindValue(":name", args[1])
-            self.query.bindValue(":sex", args[2])
-            self.query.bindValue(":isActive", args[3])
-            self.query.exec_()
+    def disconnect(self):
+        self.db.close()
+        QtSql.QSqlDatabase.removeDatabase("QODBC")
+        del self.db
 
     def deleteDay(self, day):
         self.query.prepare("DELETE FROM WorkDays "
@@ -222,20 +186,8 @@ class AnvizRegisters:
             self.query.exec_()
         return self.howthequerydid()
 
-    def randomLoad(self, name):
-        if name == "WorkDays":
-            self.query.prepare("INSERT INTO WorkDays (workdayid, worker, checkin, checkout, shift) "
-                               "VALUES (:id, :worker, :checkin, :checkout, :shift)")
-
-            self.query.bindValue(":id", 2)
-            self.query.bindValue(":worker", 20)
-            self.query.bindValue(":checkin", QtCore.QDateTime(dt.datetime(2016, 1, 1)))
-            self.query.bindValue(":checkout", QtCore.QDateTime(dt.datetime(2016, 1, 1)))
-            self.query.bindValue(":shift", 3)
-
-            self.query.exec_()
-
-        return self.howthequerydid(name)
+    def first(self):
+        return self.query.first()
 
     def getShcedulesDetails(self, option="byId"):
         """
@@ -279,45 +231,6 @@ class AnvizRegisters:
             shift_details[shift][schedule] = [self.query.value(i) for i in range(2, 8)]
 
         return shift_details
-
-    def schedules_overnight_map(self):
-        overnight_map = {}
-        self.query.exec("SELECT Schid, isOvernight FROM Schedule")
-        while self.query.next():
-            overnight_map[self.query.value(0)] = self.query.value(1) > 0
-        return overnight_map
-
-    def schedules_map(self):
-        """
-        Returns a relation for all the schedules and the shifts
-        :return: dict
-        """
-        schmap = dict([])
-
-        self.query.exec("SELECT DISTINCT a.Schid, b.Schname, a.Timeid, c.Timename "
-                        "FROM ("
-                        "   SchTime a "
-                        "   INNER JOIN Schedule b "
-                        "       ON (a.Schid = b.Schid)) "
-                        "   INNER JOIN "
-                        "   TimeTable c "
-                        "       ON (a.Timeid = c.Timeid)")
-
-        while self.query.next():
-            schid = self.query.value(0)
-            schname = self.query.value(1)
-            timeid = self.query.value(2)
-            timename = self.query.value(3)
-
-            sch = SchMapping(schname, schid)
-            time = SchMapping(timename, timeid)
-
-            if sch not in schmap:
-                schmap[sch] = [time]
-            else:
-                schmap[sch] += [time]
-
-        return schmap
 
     def getWorkers(self, option="byName", isActive=True):
         """
@@ -406,6 +319,41 @@ class AnvizRegisters:
 
         return workers
 
+    def howthequerydid(self, optional_info=''):
+        error = self.query.lastError().text()
+        if error is None:
+            message = optional_info + ' NOT a valid option'
+        elif error == ' ':
+            message = "Query completed"
+        else:
+            message = error
+
+        return message
+
+    def insertInto(self, table, *args, **kwargs):
+        if table == "WorkDays":
+            self.query.prepare("INSERT INTO WorkDays ("
+                               "    day, worker, InTime_1, OutTime_1, InTime_2, "
+                               "    OutTime_2, InTime_3 , OutTime_3, shift) "
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            for i, value in enumerate(args):
+                self.query.bindValue(i, value)
+            self.query.exec_()
+
+        else:
+            keys = ', '.join(kwargs.keys())
+            values = kwargs.values()
+            self.query.prepare("INSERT INTO {} ({}) ".format(table, keys) +
+                               "VALUES ({})".format(", ".join(['?' for v in values])))
+            for v in values:
+                self.query.addBindValue(v)
+            self.query.exec_()
+
+            print(self.query.lastQuery())
+
+    def last(self):
+        return self.query.last()
+
     def min_date_of(self, table):
 
         if table == 'Checkinout':
@@ -482,39 +430,97 @@ class AnvizRegisters:
 
         return id_
 
-    def di_it_failed(self):
-        if self.query.lastError().number() == -1:
-            return False
-        else:
-            return True
-
-    def howthequerydid(self, optional_info=''):
-        error = self.query.lastError().text()
-        if error is None:
-            message = optional_info + ' NOT a valid option'
-        elif error == ' ':
-            message = "Query completed"
-        else:
-            message = error
-
-        return message
-
-    def value(self, i):
-        return self.query.value(i)
+    def new_query(self):
+        self.query = QtSql.QSqlQuery()
 
     def next(self):
         return self.query.next()
 
-    def first(self):
-        return self.query.first()
+    def refreshConnection(self):
+        self.__connect()
 
-    def last(self):
-        return self.query.last()
+    def readTable(self, name,
+                  from_date=dt.datetime(1999, 1, 1),  # minimum valid date
+                  till_date=dt.datetime(2100, 1, 1)   # large valid date
+                  ):
+        """
 
-    def disconnect(self):
-        self.db.close()
-        QtSql.QSqlDatabase.removeDatabase("QODBC")
-        del self.db
+        Makes a READ query on the "name" table
+
+        :param name: indicates the table in which the query wants to be made
+        :param from_date: \ _  date filters, as most of the queries will be
+        :param till_date: /    bounded by a date range restrain
+        :return: a message with the result status of the query
+        """
+        if name == "Checkinout":
+            self.query.prepare("SELECT Logid, Userid, CheckTime, CheckType "
+                               "FROM Checkinout "
+                               "WHERE CheckTime >= :from_date AND CheckTime <= :till_date")
+            self.query.bindValue(":from_date", QtCore.QDateTime(from_date))
+            self.query.bindValue(":till_date", QtCore.QDateTime(till_date))
+            self.query.exec_()
+
+        return self.howthequerydid(name)
+
+    def randomLoad(self, name):
+        if name == "WorkDays":
+            self.query.prepare("INSERT INTO WorkDays (workdayid, worker, checkin, checkout, shift) "
+                               "VALUES (:id, :worker, :checkin, :checkout, :shift)")
+
+            self.query.bindValue(":id", 2)
+            self.query.bindValue(":worker", 20)
+            self.query.bindValue(":checkin", QtCore.QDateTime(dt.datetime(2016, 1, 1)))
+            self.query.bindValue(":checkout", QtCore.QDateTime(dt.datetime(2016, 1, 1)))
+            self.query.bindValue(":shift", 3)
+
+            self.query.exec_()
+
+        return self.howthequerydid(name)
+
+    def schedules_overnight_map(self):
+        overnight_map = {}
+        self.query.exec("SELECT Schid, isOvernight FROM Schedule")
+        while self.query.next():
+            overnight_map[self.query.value(0)] = self.query.value(1) > 0
+        return overnight_map
+
+    def schedules_map(self):
+        """
+        Returns a relation for all the schedules and the shifts
+        :return: dict
+        """
+        schmap = dict([])
+
+        self.query.exec("SELECT DISTINCT a.Schid, b.Schname, a.Timeid, c.Timename "
+                        "FROM ("
+                        "   SchTime a "
+                        "   INNER JOIN Schedule b "
+                        "       ON (a.Schid = b.Schid)) "
+                        "   INNER JOIN "
+                        "   TimeTable c "
+                        "       ON (a.Timeid = c.Timeid)")
+
+        while self.query.next():
+            schid = self.query.value(0)
+            schname = self.query.value(1)
+            timeid = self.query.value(2)
+            timename = self.query.value(3)
+
+            sch = SchMapping(schname, schid)
+            time = SchMapping(timename, timeid)
+
+            if sch not in schmap:
+                schmap[sch] = [time]
+            else:
+                schmap[sch] += [time]
+
+        return schmap
+
+    def tableExists(self, name):
+        return name in self.db.tables()
+
+    def value(self, i):
+        return self.query.value(i)
 
 
 # *** TESTS ***
@@ -574,6 +580,10 @@ def insertInto():
     )))
 
 
+def insertIntoUserShift():
+    anvRgs.insertInto("UserShift", a=1, b=2, c=3)
+
+
 def deleteDay(day):
     anvRgs.deleteDay(day)
 
@@ -585,6 +595,7 @@ def dates():
 def addColumn():
     print(anvRgs.addColumn("Userinfo", "isActive", bool))
     print(anvRgs.query.lastQuery())
+
 
 
 if __name__ == "__main__":
@@ -607,6 +618,7 @@ if __name__ == "__main__":
     # insertInto()
     # dates()
     # deleteDay(dt.datetime.today().date())
-    addColumn()
+    # addColumn()
+    insertIntoUserShift()
     anvRgs.db.close()
     sys.exit(app.closeAllWindows())

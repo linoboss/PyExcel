@@ -10,24 +10,70 @@ qtCreatorFile = "ui\\addworkerview.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
 
 
-(USERID, NAME, SEX, ISACTIVE) = range(4)
-ISACTIVE = 28
-
-
 class AddWorkerView_controller(Ui_MainWindow, QtBaseClass):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.anvRgs = sql.AnvizRegisters()
+        self.qindate.setDate(QtCore.QDate(1, 1, 1).currentDate())
+        self.shifts = self.anvRgs.schedules_map()
+        self.workers = self.anvRgs.getWorkers("byId")
+        self.qschedule.addItems(list(map(lambda k: k.name, self.shifts.keys()))[::-1])
+        self.toolBox.setCurrentIndex(0)
 
     @QtCore.pyqtSlot()
     def on_qadd_clicked(self):
-        # QtGui.QSpinBox().value()
-        # QtGui.QCheckBox().isChecked()
-        id_ = self.qid.value()
+        # Escenciales
+        id_worker = self.qid.value()
         name = self.qname.text()
-        sex = self.qsex.currentText()
         isactive = self.qisactive.isChecked()
-        sql.AnvizRegisters().insertInto("Userinfo", id_, name, sex, isactive)
+        schedule = self.qschedule.currentText()
+
+        # Personal data
+        sex = self.qsex.currentText()
+        ci = self.qci.text()
+        birthdate = self.qbirthdate.text()
+        phone = self.qphone.text()
+        address = self.qaddress.text()
+        description = self.qdescription.toPlainText()
+        # Work data
+        position = self.qposition.text()
+        indate = self.qindate.date()
+
+        # set schedule id
+        id_sch = None
+        for k in self.shifts.keys():
+            if str(k) == schedule:
+                id_sch = int(k)
+
+        # Checking for no duplicated ids
+        if id_worker == 0:
+            helpers.PopUps.inform_user("ID en captahuellas no puede ser cero")
+            return
+        elif id_worker in self.workers:
+            helpers.PopUps.inform_user("ID en captahuellas duplicada")
+            return
+
+        # inserting new worker's schedule
+        sql.AnvizRegisters().insertInto("UserShift",
+                                        Userid=id_worker,
+                                        Schid=id_sch,
+                                        BeginDate=indate,
+                                        EndDate=" ")
+
+        # inserting new worker's data
+        sql.AnvizRegisters().insertInto("Userinfo",
+                                        Userid=id_worker,
+                                        Name=name,
+                                        Sex=sex,
+                                        Brithday=birthdate,
+                                        EmployDate=indate,
+                                        Telephone=phone,
+                                        Duty=position,
+                                        Address=address,
+                                        Remark=description,
+                                        IDCard=ci,
+                                        isActive=isactive)
 
 
 if __name__ == "__main__":

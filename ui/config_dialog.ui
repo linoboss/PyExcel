@@ -54,7 +54,7 @@
      <item>
       <widget class="QPushButton" name="erase">
        <property name="text">
-        <string>Borrar registros de trabajo</string>
+        <string>Borrar registros</string>
        </property>
       </widget>
      </item>
@@ -66,7 +66,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QPushButton" name="eraseDay">
+      <widget class="QPushButton" name="qupdate">
        <property name="minimumSize">
         <size>
          <width>171</width>
@@ -74,7 +74,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Borrar registros de un dia</string>
+        <string>Actualizar</string>
        </property>
       </widget>
      </item>

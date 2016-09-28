@@ -24,6 +24,15 @@ class PopUps:
         messageBox.setText(text)
         messageBox.setStandardButtons(QtGui.QMessageBox.Ok)
         messageBox.setIcon(QtGui.QMessageBox.Information)
+        messageBox.exec()
+
+    @staticmethod
+    def error_message(text):
+        messageBox = QtGui.QMessageBox()
+        messageBox.setText(text)
+        messageBox.setStandardButtons(QtGui.QMessageBox.Ok)
+        messageBox.setIcon(QtGui.QMessageBox.Warning)
+        messageBox.exec()
 
     @staticmethod
     def search_file(text, initial_path, target, action='get'):
@@ -64,8 +73,22 @@ class Db:
         headerMap = OrderedDict()
         for i in range(model.columnCount()):
             headerMap[model.headerData(i, QtCore.Qt.Horizontal,
-                                       QtCore.Qt.DisplayRole).lower()] = i
+                                       QtCore.Qt.DisplayRole)] = i
         return headerMap
+
+
+class Thread(QtCore.QThread):
+    def __init__(self, func):
+        super().__init__(self)
+        self.func = func
+
+    def __del__(self):
+        self.wait()
+
+    # the execution oh the thread will be by calling
+    # the start method, which calls the run method
+    def run(self):
+        self.func()
 
 
 if __name__ == "__main__":

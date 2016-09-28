@@ -8,7 +8,7 @@ import assets.dates_tricks as md
 import assets.sql as sql
 import assets.helpers as helpers
 import configview_controller
-from assets.namespace import WorkDayTable as WDT
+from assets.printReport import PrintReport
 
 
 qtCreatorFile = "ui\\MainView.ui"
@@ -61,20 +61,12 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.dateFilter = tool.DateFilterProxyModel(self)
         self.dateFilter.setSourceModel(self.scheduleFilter)
 
-        scheduleFilter = QtGui.QSortFilterProxyModel(self)
-        scheduleFilter.setSourceModel(self.dateFilter)
-        scheduleFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        scheduleFilter.setFilterKeyColumn(SHIFT)
-
-        printFilter = tool.DateFilterProxyModel()
-        printFilter.setSourceModel(scheduleFilter)
-
         # configuring the table
-        self.qtable.setModel(printFilter)
-        self.qtable.setItemDelegate(tool.WorkDayDelegate(self))
-        for column in (0, 7, 8): self.qtable.setColumnHidden(column, True)
-        self.qtable.resizeColumnsToContents()
-        self.qtable.setSortingEnabled(False)
+        self.tableView.setModel(self.dateFilter)
+        self.tableView.setItemDelegate(tool.WorkDayDelegate(self))
+        for column in (0, 7, 8): self.tableView.setColumnHidden(column, True)
+        self.tableView.resizeColumnsToContents()
+        self.tableView.setSortingEnabled(False)
 
         # setting the initial values of the comboboxes
         self.qworkers.addItems(
@@ -92,10 +84,18 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.nameFilter.setFilterRegExp('.*')
         self.dateFilter.removeFilter()
 
+    def ask_user_to_reopen_program(self):
+        helpers.PopUps.inform_user("Usted cambio la direccion de la base de datos.\n"
+                                   "El programa cerrara automaticamente,"
+                                   "por favor, abralo nuevamente")
+        QtGui.QApplication.instance().closeAllWindows()
+        sys.exit()
+
     @QtCore.pyqtSlot("QAction*")
     def on_menubar_triggered(self, action):
         if action is self.action_database:
-            configview = configview_controller.ScheduleConfiguration_Controller()
+            configview = configview_controller.ScheduleConfiguration_Controller(self)
+            self.connect(configview, QtCore.SIGNAL('dbChanged()'), self.ask_user_to_reopen_program)
             configview.exec()
         elif action is self.action_registers:
             from checkinoutview_controller import Checkinoutview_Controller
@@ -134,130 +134,19 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qprint_clicked(self):
-
-        filename = helpers.PopUps.search_file(
-            'Donde desea ubicar el archivo?',
-            sql.ConfigFile.get('print_path'),
-            'pdf',
-            'save')
-        if filename == '':
-            helpers.PopUps.inform_user("No se creo el documento")
+        print_report = PrintReport()
+        if print_report.setOutputFileName() == print_report.CANCELED:
             return
-
-        self.qprint.setDisabled(True)
-        scheduleFilter = QtGui.QSortFilterProxyModel(self)
-        scheduleFilter.setSourceModel(self.dateFilter)
-        scheduleFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        scheduleFilter.setFilterKeyColumn(SHIFT)
-
-        printFilter = tool.DateFilterProxyModel()
-        printFilter.setSourceModel(scheduleFilter)
-
-        FIRST_REGISTER = 0
-        LAST_REGISTER = printFilter.rowCount() - 1
-
-        # Si no hay registros retorna None
-        if LAST_REGISTER == 0:
-            return
-
-        from_date = printFilter.index(FIRST_REGISTER, DAY).data().toPyDateTime().date()
-        to_date = printFilter.index(LAST_REGISTER, DAY).data().toPyDateTime().date()
-
-        not_css = {"td": "padding:5px;",
-                   "table": "border-width: 1px;border-style: solid;border-color: black;color: black;"}
-        html = ""
-
-        for date in md.MyDates.dates_range(from_date, to_date):
-            printFilter.setSingleDateFilter(date)
-            if printFilter.rowCount() == 0: continue
-            html += ("<html>"
-                     "<body>"
-                     "<table><tr>"
-                     # "<td><img src='C:\\ControlHorario\\PyExcel\\images\\SGlogo.png'></td>"
-                     "<td align=right valign=bottom style='padding-left:450px'>"
-                     "<div style='font-size:25px'><b>ASISTENCIAS<br>DIARIAS</b></div></td>"
-                     "</tr></table><br><hr>")
-            html += ("<p>"
-                     "{} {} de {} del {}</p><br>".format(md.MyDates.dayName(date),
-                                                         date.day,
-                                                         md.MyDates.monthName(date.month),
-                                                         date.year))
-            for sch in self.anvReader.schedules:
-                # if sch.lower() == 'nocturno': continue
-                scheduleFilter.setFilterRegExp(sch)
-                if printFilter.rowCount() == 0: continue
-                html += "Horario {}".format(sch)
-                html += "<table cellspacing='0' style='{}'>".format(not_css["table"])
-                html += ("<tr>"
-                         "<th width=170>Nombre</th>"
-                         "<th width=70>Entrada</th>"
-                         "<th width=70>Salida</th>"
-                         "<th width=70>Entrada</th>"
-                         "<th width=70>Salida</th>"
-                         "<th width=70 style='font-size:10px'>Tiempo<br>Trabajado</th>"
-                         "<th width=70 style='font-size:10px'>Tiempo<br>Extra</th>"
-                         "<th width=70 style='font-size:10px'>Tiempo<br>Ausente</th>"
-                         "<th width=200>Firma</th>"
-                         "</tr>")
-                for row in range(printFilter.rowCount()):
-                    html += "<tr>"
-
-                    for column in range(13):
-
-                        if column == ID: continue
-                        elif column == DAY: continue
-                        elif column == INTIME_3: continue
-                        elif column == OUTTIME_3: continue
-                        elif column == SHIFT: continue
-                        elif INTIME_1 <= column <= OUTTIME_3:
-                            qdate = printFilter.index(row, column).data()
-                            if qdate == QtCore.QTime():
-                                item = '--:--'
-                            else:
-                                item = qdate.toString("hh:mm")
-                        elif column >= WORKED_TIME:
-                            item = printFilter.index(row, column).data().toString('hh:mm')
-                        else:
-                            item = printFilter.index(row, column).data()
-                        html += "<td align=center style='{}'>".format(not_css["td"])
-                        html += item
-                        html += "</td>"
-
-                    html += "<td style='{}'></td>".format(not_css["td"])
-                    html += "</tr>"
-                html += "</table>"
-
-            #  html += "<br>"*6
-            #  html += "<hr width=300>"
-            #  html += "<p style='margin-left:380px;'>Revisado por</p>"
-            html += "<div style='page-break-before:always'></div>"
-
-        # send the html document to the printer
-        printer = QtGui.QPrinter()
-        dpi = 96
-        printer.setResolution(dpi)
-
-        printer.setOutputFileName(filename)
-        sql.ConfigFile.set('print_path',
-                           str.join('\\', filename.split('\\')[:-1]))
-        printer.setPageSize(QtGui.QPrinter.Letter)
-        printer.setOrientation(QtGui.QPrinter.Landscape)
-        printer.setOutputFormat(QtGui.QPrinter.PdfFormat)
-        # printer.setPageMargins(30, 16, 12, 20, QtGui.QPrinter.Millimeter)
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        doc = QtGui.QTextDocument()
-        doc.setDefaultFont(font)
-        doc.setHtml(html)
-        doc.print_(printer)
-        doc.documentLayout().setPaintDevice(printer)
-
+        print_report.setup()
+        print_report.setSourceModel(self.dateFilter)
+        print_thread = helpers.Thread(lambda: print_report.load_and_create_file)
+        self.connect(print_thread, QtCore.SIGNAL("finished()"), self.documentCreated)
+        print_thread.start()
         QtGui.QApplication.processEvents()  # flushes the signal queue and prevents multiple clicks
 
-        self.qprint.setDisabled(False)
-
-        from assets.helpers import PopUps
-        PopUps.inform_user("El documento fue creado exitosamente")
+    @QtCore.pyqtSlot()
+    def on_configview_dbChanged(self):
+        print('aja!')
 
     @QtCore.pyqtSlot()
     def on_qdatesrangebutton_clicked(self):
@@ -273,6 +162,11 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def initProcedure(self):
         pass
 
+    def documentCreated(self):
+        from assets.helpers import PopUps
+        PopUps.inform_user("El documento fue creado exitosamente")
+
+    # TODO reformular este mecanismo para q el update table sea creado en otro thread
     def conectToDatabase(self):
 
         initial_path = sql.ConfigFile.get("database_path")
@@ -294,10 +188,10 @@ class MainView(Ui_MainWindow, QtBaseClass):
         except TypeError:
             if (helpers.PopUps.ask_user_to("El archivo de la base de datos esta incompleto",
                                            "Desea buscar un archivo distinto?")
-                    == QtGui.QMessageBox.YES):
+                    == QtGui.QMessageBox.Yes):
                 self.conectToDatabase()
-            else:
-                self.closeProgram()
+        except Exception as e:
+            helpers.PopUps.error_message(str(e))
         return anvizReader
 
 
