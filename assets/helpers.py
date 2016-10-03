@@ -35,7 +35,7 @@ class PopUps:
         messageBox.exec()
 
     @staticmethod
-    def search_file(text, initial_path, target, action='get'):
+    def search_file(text, initial_path, target, action='get', parent=None):
         if target == 'database':
             filter_ = "Access db (*.mdb)"
         elif target == 'pdf':
@@ -46,10 +46,10 @@ class PopUps:
         while True:
             if action == 'get':
                 filename = QtGui.QFileDialog.getOpenFileName(
-                    None, text, initial_path, filter_)
+                    parent, text, initial_path, filter_)
             elif action == 'save':
                 filename = QtGui.QFileDialog.getSaveFileName(
-                    None, text, initial_path, filter_)
+                    parent, text, initial_path, filter_)
             filename = filename.replace('/', '\\')
             if filename:
                 break
@@ -71,19 +71,21 @@ class Db:
 
         from collections import OrderedDict
         headerMap = OrderedDict()
+        i = 0
         for i in range(model.columnCount()):
             headerMap[model.headerData(i, QtCore.Qt.Horizontal,
                                        QtCore.Qt.DisplayRole)] = i
+        if table == "WorkDays":
+            headerMap["workedtime"] = i + 1
+            headerMap["extratime"] = i + 2
+            headerMap["absenttime"] = i + 3
         return headerMap
 
 
 class Thread(QtCore.QThread):
     def __init__(self, func):
-        super().__init__(self)
+        super().__init__()
         self.func = func
-
-    def __del__(self):
-        self.wait()
 
     # the execution oh the thread will be by calling
     # the start method, which calls the run method

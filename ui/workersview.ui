@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
-    <height>257</height>
+    <width>661</width>
+    <height>378</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Horarios</string>
+   <string>Trabajadores</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -32,14 +32,16 @@
      <item>
       <widget class="QPushButton" name="qadd">
        <property name="text">
-        <string>Agregar</string>
+        <string>Agregar
+Trabajador</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="qdelete">
        <property name="text">
-        <string>Elimminar</string>
+        <string>Elimminar
+Seleccionado</string>
        </property>
       </widget>
      </item>

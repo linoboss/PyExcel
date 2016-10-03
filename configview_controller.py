@@ -51,6 +51,8 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
         if self.confirmar():
             anvRgs = sql.AnvizRegisters()
             anvRgs.deleteRegistersFrom('WorkDays')
+
+            self.emit(SIGNAL('registersErased()'))
         else:
             return
 

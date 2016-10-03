@@ -29,7 +29,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
         self.initProcedure()
 
-        self.anvReader = self.conectToDatabase()
+        self.anvReader = AnvizReader()
 
         # setting the models and filters
 
@@ -85,9 +85,8 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.dateFilter.removeFilter()
 
     def ask_user_to_reopen_program(self):
-        helpers.PopUps.inform_user("Usted cambio la direccion de la base de datos.\n"
-                                   "El programa cerrara automaticamente,"
-                                   "por favor, abralo nuevamente")
+        helpers.PopUps.inform_user("El programa cerrara automaticamente.\n"
+                                   "Por favor, abralo nuevamente")
         QtGui.QApplication.instance().closeAllWindows()
         sys.exit()
 
@@ -96,6 +95,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
         if action is self.action_database:
             configview = configview_controller.ScheduleConfiguration_Controller(self)
             self.connect(configview, QtCore.SIGNAL('dbChanged()'), self.ask_user_to_reopen_program)
+            self.connect(configview, QtCore.SIGNAL('registersErased()'), self.ask_user_to_reopen_program)
             configview.exec()
         elif action is self.action_registers:
             from checkinoutview_controller import Checkinoutview_Controller
@@ -105,6 +105,10 @@ class MainView(Ui_MainWindow, QtBaseClass):
             from schedulesview_controller import  Schedulesview_Controller
             schview = Schedulesview_Controller(self)
             schview.exec()
+        elif action is self.action_workers:
+            from workersview_controller import Workersview_controller
+            checkioview = Workersview_controller(self)
+            checkioview.exec()
         else:
             helpers.PopUps.inform_user("not implemented!")
 
@@ -134,14 +138,16 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qprint_clicked(self):
-        print_report = PrintReport()
+        print_report = PrintReport(self)
         if print_report.setOutputFileName() == print_report.CANCELED:
             return
-        print_report.setup()
+        if self.qworkers.currentIndex() == 0:
+            print_report.setup(mode="allWorkers")
+        else:
+            print_report.setup(mode="singleWorker")
         print_report.setSourceModel(self.dateFilter)
-        print_thread = helpers.Thread(lambda: print_report.load_and_create_file)
-        self.connect(print_thread, QtCore.SIGNAL("finished()"), self.documentCreated)
-        print_thread.start()
+        print_report.load_and_create_file()
+        self.documentCreated()
         QtGui.QApplication.processEvents()  # flushes the signal queue and prevents multiple clicks
 
     @QtCore.pyqtSlot()
@@ -152,6 +158,16 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def on_qdatesrangebutton_clicked(self):
         self.dateFilter.setRangeDateFilter(self.qfromdate.date(),
                                            self.qtodate.date())
+
+    @QtCore.pyqtSlot("int")
+    def on_tabWidget_currentChanged(self, index):
+        pass
+
+    @QtCore.pyqtSlot()
+    def on_qcalculate_clicked(self):
+        self.tableView_total.setModel(
+            tool.TotalizeWorkedTime(self.tableView.model())
+        )
 
     @staticmethod
     def closeProgram():
@@ -165,34 +181,6 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def documentCreated(self):
         from assets.helpers import PopUps
         PopUps.inform_user("El documento fue creado exitosamente")
-
-    # TODO reformular este mecanismo para q el update table sea creado en otro thread
-    def conectToDatabase(self):
-
-        initial_path = sql.ConfigFile.get("database_path")
-        try:
-            anvizReader = AnvizReader()
-        except ConnectionError:
-            if helpers.PopUps.ask_user_to('Error en la base de datos, desea ubicar '
-                                          'una base de datos valida?') == QtGui.QMessageBox.Yes:
-                sql.ConfigFile.set('database_path',
-                                   helpers.PopUps.search_file("Seleccione una base de datos valida",
-                                                              initial_path,
-                                                              "database"))
-                self.conectToDatabase()
-            else:
-                self.closeProgram()
-        try:
-            # TODO if by any reason the database is not correctly configured, load an empy model
-            anvizReader.updateTable()
-        except TypeError:
-            if (helpers.PopUps.ask_user_to("El archivo de la base de datos esta incompleto",
-                                           "Desea buscar un archivo distinto?")
-                    == QtGui.QMessageBox.Yes):
-                self.conectToDatabase()
-        except Exception as e:
-            helpers.PopUps.error_message(str(e))
-        return anvizReader
 
 
 if __name__ == "__main__":

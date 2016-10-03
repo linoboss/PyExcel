@@ -98,14 +98,13 @@ class SchMapping:
 
 
 class AnvizRegisters:
-    def __init__(self, database_path=None):
+    def __init__(self, database_path=None, startQuery=True):
         # *** Variable declaration ***
-        self.db = QtSql.QSqlDatabase.database()
+        self.db = QtSql.QSqlDatabase().database()
 
         # *** init actions ***
         if not self.db.open():
             self.__connect(database_path)
-
         self.query = QtSql.QSqlQuery()
 
     def addColumn(self, table, name, type_):
@@ -164,7 +163,7 @@ class AnvizRegisters:
 
     def disconnect(self):
         self.db.close()
-        QtSql.QSqlDatabase.removeDatabase("QODBC")
+        QtSql.QSqlDatabase().removeDatabase("QODBC")
         del self.db
 
     def deleteDay(self, day):
@@ -619,6 +618,7 @@ if __name__ == "__main__":
     # dates()
     # deleteDay(dt.datetime.today().date())
     # addColumn()
-    insertIntoUserShift()
+    # insertIntoUserShift()
+    print(anvRgs.getWorkers("shifts by name"))
     anvRgs.db.close()
     sys.exit(app.closeAllWindows())

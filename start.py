@@ -1,18 +1,41 @@
 import sys, os
-from PyQt4 import QtGui, QtSql
+from PyQt4 import QtGui, QtSql, QtCore, uic
 from mainview_controller import MainView
 import assets.sql as sql
 import assets.helpers as helpers
+from assets.anviz_reader import AnvizReader
+import time
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No
+
+qtCreatorFile = "ui\\startDlg.ui"
+Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
+
+
+class StartDlg(Ui_MainWindow, QtBaseClass):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.setImg("../../../Users/Lino Bossio/Pictures/1965243.jpg")
+
+    def setText(self, text):
+        self.info.setText(text)
+
+    def setImg(self, path):
+        self.image.setPixmap(QtGui.QPixmap(path))
 
 
 class Start:
     def __init__(self):
         self.app = QtGui.QApplication(sys.argv)
+        self.startDlg = StartDlg()
+        self.startDlg.show()
 
-    def program(self):
+    def __call__(self):
+        sys.exit(self.app.exec())
+
+    def tests(self):
         """
         Revision de elementos críticos para el funcionamiento
         del programa
@@ -24,6 +47,8 @@ class Start:
         else:
             text = "Archivo de configuracion creado"
             sql.ConfigFile.create()
+        self.startDlg.setText(text)
+
 
         # buscar archivo de la base de datos
         if os.path.exists(
@@ -34,8 +59,9 @@ class Start:
                 self.search_db_file()
             else:
                 self.close()
-
             text = "Base de datos seleccionada"
+        self.startDlg.setText(text)
+
         # conectar con la base de datos
         try:
             anvRgs = sql.AnvizRegisters()
@@ -51,10 +77,12 @@ class Start:
         else:
             anvRgs.createTable("WorkDays")
             text = "Tabla WorkDays creada"
+        self.startDlg.setText(text)
 
         # revisar que existan elementos en la tabla Checkinout
         model = QtSql.QSqlTableModel()
         model.setTable("Checkinout")
+        model.select()
         if model.rowCount() == 0:
             helpers.PopUps.inform_user("No hay registros en la base de datos!")
 
@@ -66,10 +94,16 @@ class Start:
 
         anvRgs.disconnect()
 
-        mainview = MainView()
+    def updates(self):
+        anvizReader = AnvizReader()
+        for d in anvizReader.updateTable():
+            print(d)
+        anvizReader.close_conection()
+        print('aki')
 
+    def mainview(self):
+        mainview = MainView()
         mainview.show()
-        sys.exit(self.app.exec())
 
     @staticmethod
     def ask_user_to(option, sub=None):
@@ -111,4 +145,12 @@ class Start:
 
 if __name__ == "__main__":
     start = Start()
-    start.program()
+    start_thread = helpers.Thread(start.tests)
+    update_thread = helpers.Thread(start.updates)
+
+    start_thread.finished.connect(update_thread.start)
+    update_thread.finished.connect(start.startDlg.close)
+    update_thread.finished.connect(start.mainview)
+
+    start_thread.start()
+    start()

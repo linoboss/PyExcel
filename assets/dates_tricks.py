@@ -46,7 +46,6 @@ class MyDates:
 
     @staticmethod
     def getWeek(date):
-        print(date)
         week = None
         weeks = calendar.monthcalendar(date.year, date.month)
         for week in weeks:

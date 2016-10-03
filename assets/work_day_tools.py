@@ -3,6 +3,7 @@ from PyQt4 import uic
 from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, QtGui, QtSql
 from assets.dates_tricks import MyDates as md
+import datetime as dt
 
 (ID, DAY, WORKER,
  INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3,
@@ -52,17 +53,6 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
         elif column == WORKER:
             return QtCore.QSize(150, 20)
         return QtCore.QSize(100, 20)
-
-    """
-    def createEditor(self, parent, option, index):
-        pass
-
-    def commitAndCloseEditor(self):
-        pass
-
-    def setModelData(self, editor, model, index):
-        pass
-"""
 
 
 class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
@@ -229,4 +219,108 @@ class CalculusModel(QtGui.QIdentityProxyModel):
                 [worked_time, extra_time, absent_time]
             )
         self.emit(QtCore.SIGNAL("dataChanged()"), self)
+
+
+class TotalizeModel(QtCore.QAbstractTableModel):
+    def __init__(self, source, parent=None):
+        super().__init__(parent)
+        self.source = source
+        self._data = []
+        for row in self.source:
+            data_row = []
+            for elem in row:
+                if isinstance(elem, str):
+                    data_row.append(elem)
+                elif isinstance(elem, int):
+                    data_row.append(secondsToTime(elem))
+            self._data.append(data_row)
+        print(self._data)
+
+    def rowCount(self, QModelIndex_parent=None, *args, **kwargs):
+        return len(self._data)
+
+    def columnCount(self, QModelIndex_parent=None, *args, **kwargs):
+        return 4
+
+    def data(self, index, role=None):
+
+        column = index.column()
+
+        if role == Qt.DisplayRole:
+            row = index.row()
+            item = self._data[row][column]
+            return item
+        elif role == Qt.TextAlignmentRole:
+            if column > 0:
+                return Qt.AlignCenter | Qt.AlignVCenter
+            else:
+                return Qt.AlignLeft | Qt.AlignVCenter
+        elif role == Qt.SizeHintRole:
+            return QtCore.QSize(400)
+        return None
+
+    def headerData(self, section, orientation, role=None):
+        if role == Qt.TextAlignmentRole:
+            if orientation == Qt.Horizontal:
+                return Qt.AlignCenter | Qt.AlignVCenter
+        if role != Qt.DisplayRole:
+            return None
+        if orientation == Qt.Horizontal:
+            if section == 0:
+                return 'Nombre'
+            elif section == 1:
+                return 'Tiempo\nTrabajado'
+            elif section == 2:
+                return 'Tiempo\nExtra'
+            elif section == 3:
+                return 'Tiempo\nAusente'
+
+
+def TotalizeWorkedTime(model):
+    """
+
+    :param model: CalculusModel()
+    :return:
+    """
+    # assert isinstance(model, CalculusModel)
+    workers_workedTime = {}
+    # read and organize data from model
+    for i in range(model.rowCount()):
+        worker = model.index(i, WORKER).data()
+        worked_time = model.index(i, WORKED_TIME).data()
+        extra_time = model.index(i, EXTRA_TIME).data()
+        absent_time = model.index(i, ABSENT_TIME).data()
+
+        if worker not in workers_workedTime.keys():
+            workers_workedTime[worker] = [0] * 3
+        else:
+            workers_workedTime[worker][0] += QtCore.QTime(0, 0, 0).secsTo(worked_time)
+            workers_workedTime[worker][1] += QtCore.QTime(0, 0, 0).secsTo(extra_time)
+            workers_workedTime[worker][2] += QtCore.QTime(0, 0, 0).secsTo(absent_time)
+        pass
+
+    # transform dict to matrix
+    matrix = []
+    for k, v in workers_workedTime.items():
+        matrix.append([k] + v)
+
+    return TotalizeModel(matrix)
+
+
+def secondsToTime(seconds):
+    def secToTime(workdays=0, hours=0, mins=0, secs=0):
+        if secs < 60:
+            text = "{} jornadas, {}:{} horas"
+            if workdays == 1:
+                text = "{} jornada, {}:{} horas"
+            return text.format(workdays, hours, mins)
+        elif secs >= 28800:
+            return secToTime(workdays + 1, hours, mins, secs - 28800)
+        elif secs >= 3600:
+            return secToTime(workdays, hours + 1, mins, secs - 3600)
+        elif secs >= 60:
+            return secToTime(workdays, hours, mins + 1, secs - 60)
+
+    return secToTime(secs=seconds)
+
 

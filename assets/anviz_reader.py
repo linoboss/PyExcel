@@ -35,6 +35,7 @@ class AnvizReader:
         self.schedules = list(map(lambda x: str(x.name), self.schedules_map.keys()))
         self.workers_by_id = self.anvRgs.getWorkers("byId")
         self.workers_shifts_id = self.anvRgs.getWorkers("shifts by id")
+        self.workers_shifts_name = self.anvRgs.getWorkers("shifts by name")
 
         self.exeptions = []  # list of indexes of Checkinout logs that failed the validation
 
@@ -89,7 +90,9 @@ class AnvizReader:
         CheckDate = self.anvRgs.value(CHECKTIME).toPyDateTime().date()
 
         workdays = []
+        print(dates_range)
         for d in dates_range:
+            yield d
             # WorkDay day template
             workday = self.workdayTemplate(d)
             while CheckDate == d:
@@ -163,6 +166,7 @@ class AnvizReader:
             i += 1
         if coords != 0 and coords == i * 2:
             coords = None
+
         return coords
 
     def workdayTemplate(self, day):
@@ -189,6 +193,9 @@ class AnvizReader:
                 overnight_workers.append(w)
         return overnight_workers
 
+    def close_conection(self):
+        self.anvRgs.disconnect()
+
 # *** Tests ***
 
 
@@ -213,6 +220,6 @@ if __name__ == "__main__":    # run()
 
     reader = AnvizReader()
     # getShifts()
-    update()
+    # update()
     sys.exit()
 
