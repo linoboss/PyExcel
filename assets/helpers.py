@@ -92,6 +92,9 @@ class Thread(QtCore.QThread):
     def run(self):
         self.func()
 
+    def finishWith(self, func):
+        self.finished.connect(func)
+
 
 if __name__ == "__main__":
     import assets.anviz_reader as av

@@ -145,12 +145,12 @@ class Start:
 
 if __name__ == "__main__":
     start = Start()
-    start_thread = helpers.Thread(start.tests)
-    update_thread = helpers.Thread(start.updates)
-
-    start_thread.finished.connect(update_thread.start)
-    update_thread.finished.connect(start.startDlg.close)
-    update_thread.finished.connect(start.mainview)
-
-    start_thread.start()
     start()
+    QtGui.QApplication.processEvents()
+    start.tests()
+    QtGui.QApplication.processEvents()
+    start.updates()
+    QtGui.QApplication.processEvents()
+    start.startDlg.close()
+    QtGui.QApplication.processEvents()
+    start.mainview()

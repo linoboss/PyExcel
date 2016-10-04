@@ -4,8 +4,6 @@ from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, QtGui, QtSql
 from assets.anviz_reader import AnvizReader
 import assets.work_day_tools as tool
-import assets.dates_tricks as md
-import assets.sql as sql
 import assets.helpers as helpers
 import configview_controller
 from assets.printReport import PrintReport
@@ -83,6 +81,9 @@ class MainView(Ui_MainWindow, QtBaseClass):
         # mostrar todos los registros al inicio
         self.nameFilter.setFilterRegExp('.*')
         self.dateFilter.removeFilter()
+
+        # set initial display tab
+        self.tabWidget.setCurrentIndex(0)
 
     def ask_user_to_reopen_program(self):
         helpers.PopUps.inform_user("El programa cerrara automaticamente.\n"
@@ -168,6 +169,17 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.tableView_total.setModel(
             tool.TotalizeWorkedTime(self.tableView.model())
         )
+
+    @QtCore.pyqtSlot()
+    def on_printTotals_clicked(self):
+        print_report = PrintReport(self)
+        if print_report.setOutputFileName() == print_report.CANCELED:
+            return
+        print_report.setup(mode="totals")
+        print_report.setSourceModel(self.dateFilter)
+        print_report.load_and_create_file()
+        self.documentCreated()
+        QtGui.QApplication.processEvents()
 
     @staticmethod
     def closeProgram():

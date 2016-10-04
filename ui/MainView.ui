@@ -309,7 +309,7 @@ Trabajado</string>
                   </spacer>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton">
+                  <widget class="QPushButton" name="printTotals">
                    <property name="text">
                     <string>Imprimir</string>
                    </property>

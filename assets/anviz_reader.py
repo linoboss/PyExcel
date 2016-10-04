@@ -93,6 +93,7 @@ class AnvizReader:
         print(dates_range)
         for d in dates_range:
             yield d
+            QtGui.QApplication.processEvents()
             # WorkDay day template
             workday = self.workdayTemplate(d)
             while CheckDate == d:

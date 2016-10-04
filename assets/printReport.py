@@ -186,9 +186,6 @@ class PrintReport(QtCore.QObject):
         if LAST_REGISTER == 0:
             return
 
-        from_date = printFilter.index(FIRST_REGISTER, self.WDH['day']).data().toPyDateTime().date()
-        to_date = printFilter.index(LAST_REGISTER, self.WDH['day']).data().toPyDateTime().date()
-
         not_css = {"td": "padding:5px;",
                    "table": "border-width: 1px;border-style: solid;border-color: black;color: black;"}
         html = ""
@@ -250,6 +247,52 @@ class PrintReport(QtCore.QObject):
 
         self.doc.setHtml(html)
 
+    def totalsDoc(self):
+        self.file_created = False
+        if self.filename == '':
+            raise ValueError('Enter the filename before printing')
+        if self.sourceModel is None:
+            raise ValueError('Enter the sourceModel before printing')
+
+        printFilter = tool.TotalizeWorkedTime(self.sourceModel)
+
+        # Si no hay registros retorna None
+        if printFilter.rowCount() == 0:
+            return
+
+        not_css = {"td": "padding:5px;",
+                   "table": "border-width: 1px;border-style: solid;border-color: black;color: black;"}
+        html = ""
+
+        html += ("<html>"
+                 "<body>"
+                 "<table><tr>"
+                 "<td align=right valign=bottom style='padding-left:450px'>"
+                 "<div style='font-size:25px'><b>TIEMPO TOTAL<br>DE ASISTENCIAS</b></div></td>"
+                 "</tr></table><br><hr><br>")
+
+        html += "<table cellspacing='0' style='{}'>".format(not_css["table"])
+        html += ("<tr>"
+                 "<th width=170>Nombre</th>"
+                 "<th width=210>Tiempo\nTrabajado</th>"
+                 "<th width=210>Tiempo\nExtra</th>"
+                 "<th width=210>Tiempo\nAusente</th>"
+                 "</tr>")
+
+        for row in range(printFilter.rowCount()):
+            html += "<tr>"
+            QtGui.QApplication.processEvents()
+
+            for column in range(printFilter.columnCount()):
+                item = printFilter.index(row, column).data()
+                html += "<td align=center style='{}'>".format(not_css["td"])
+                html += item
+                html += "</td>"
+
+            html += "</tr>"
+        html += "</table>"
+
+        self.doc.setHtml(html)
 
     def load_and_create_file(self):
         mode = self.configuration["mode"]
@@ -257,4 +300,6 @@ class PrintReport(QtCore.QObject):
             self.allWorkersDoc()
         elif mode == "singleWorker":
             self.singleWorkerDoc()
+        elif mode == 'totals':
+            self.totalsDoc()
         self.createFile()

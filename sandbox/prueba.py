@@ -1,17 +1,39 @@
 import sys
-from assets.dates_tricks import MyDates as md
-import assets.sql as sql
-import assets.helpers as helpers
+from PyQt4 import uic
+from PyQt4.QtCore import Qt
+from PyQt4 import QtCore, QtGui, QtSql
 from assets.anviz_reader import AnvizReader
-from PyQt4 import QtGui, QtCore
-from pprint import pprint
+import assets.work_day_tools as tool
+import assets.helpers as helpers
+from assets.printReport import PrintReport
+
+
+qtCreatorFile = "tableView.ui"
+Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
+
+
+class View(Ui_MainWindow, QtBaseClass):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+def intentoDeQuery():
+    anvReader = AnvizReader()
+    print(anvReader.)
+
 
 app = QtGui.QApplication(sys.argv)
-anvRgs = sql.AnvizRegisters()
-if 'isActive' not in helpers.Db.tableHeader('Userinfo'):
-    anvRgs.addColumn('Userinfo', 'isActive', bool)
+view = View()
+anvReader = AnvizReader()
+model = QtSql.QSqlRelationalTableModel()
+model.setTable('WorkDays')
+model.select()
+view.tableView.setModel(model)
 
-if 'isOvernight' not in helpers.Db.tableHeader('Schedule'):
-    anvRgs.addColumn('Schedule', 'isOvernight', bool)
+view.show()
 
-sys.exit()
+thread = helpers.Thread()
+
+
+sys.exit(app.exec())
+
+

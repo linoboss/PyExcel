@@ -234,7 +234,6 @@ class TotalizeModel(QtCore.QAbstractTableModel):
                 elif isinstance(elem, int):
                     data_row.append(secondsToTime(elem))
             self._data.append(data_row)
-        print(self._data)
 
     def rowCount(self, QModelIndex_parent=None, *args, **kwargs):
         return len(self._data)
@@ -255,8 +254,7 @@ class TotalizeModel(QtCore.QAbstractTableModel):
                 return Qt.AlignCenter | Qt.AlignVCenter
             else:
                 return Qt.AlignLeft | Qt.AlignVCenter
-        elif role == Qt.SizeHintRole:
-            return QtCore.QSize(400)
+
         return None
 
     def headerData(self, section, orientation, role=None):
@@ -297,7 +295,6 @@ def TotalizeWorkedTime(model):
             workers_workedTime[worker][0] += QtCore.QTime(0, 0, 0).secsTo(worked_time)
             workers_workedTime[worker][1] += QtCore.QTime(0, 0, 0).secsTo(extra_time)
             workers_workedTime[worker][2] += QtCore.QTime(0, 0, 0).secsTo(absent_time)
-        pass
 
     # transform dict to matrix
     matrix = []
