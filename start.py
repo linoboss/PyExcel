@@ -4,7 +4,6 @@ from mainview_controller import MainView
 import assets.sql as sql
 import assets.helpers as helpers
 from assets.anviz_reader import AnvizReader
-import time
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No
@@ -48,7 +47,6 @@ class Start:
             text = "Archivo de configuracion creado"
             sql.ConfigFile.create()
         self.startDlg.setText(text)
-
 
         # buscar archivo de la base de datos
         if os.path.exists(
@@ -99,7 +97,6 @@ class Start:
         for d in anvizReader.updateTable():
             print(d)
         anvizReader.close_conection()
-        print('aki')
 
     def mainview(self):
         mainview = MainView()
@@ -145,7 +142,6 @@ class Start:
 
 if __name__ == "__main__":
     start = Start()
-    start()
     QtGui.QApplication.processEvents()
     start.tests()
     QtGui.QApplication.processEvents()
@@ -154,3 +150,5 @@ if __name__ == "__main__":
     start.startDlg.close()
     QtGui.QApplication.processEvents()
     start.mainview()
+
+    start()

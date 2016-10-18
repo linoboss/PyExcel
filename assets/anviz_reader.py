@@ -90,7 +90,6 @@ class AnvizReader:
         CheckDate = self.anvRgs.value(CHECKTIME).toPyDateTime().date()
 
         workdays = []
-        print(dates_range)
         for d in dates_range:
             yield d
             QtGui.QApplication.processEvents()

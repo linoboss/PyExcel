@@ -105,7 +105,8 @@ class AnvizRegisters:
         # *** init actions ***
         if not self.db.open():
             self.__connect(database_path)
-        self.query = QtSql.QSqlQuery()
+        if startQuery:
+            self.query = QtSql.QSqlQuery()
 
     def addColumn(self, table, name, type_):
         self.query = QtSql.QSqlQuery()
@@ -149,7 +150,9 @@ class AnvizRegisters:
                             "OutTime_2 DATETIME, "
                             "InTime_3 DATETIME, "
                             "OutTime_3 DATETIME, "
-                            "shift INTEGER REFERENCES Schedule(Schid)"
+                            "shift INTEGER REFERENCES Schedule(Schid), "
+                            "status INTEGER"
+                            ""
                             ")")
         else:
             raise KeyError(name + ' is not a valid option')

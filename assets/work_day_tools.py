@@ -67,10 +67,17 @@ class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
         self.from_date = None
         self.to_date = None
         self.mode = "no filter"
+        self.key_column = DAY
+
+    def setFilterKeyColumn(self, column):
+        self.key_column = column
 
     def removeFilter(self):
         self.mode = "no filter"
         self.invalidateFilter()
+
+    def fieldIndex(self, field):
+        return self.sourceModel().fieldIndex(field)
 
     def setSingleDateFilter(self, date):
         self.mode = "single"
@@ -88,10 +95,12 @@ class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
         Reimplemented from base class
         Executes a set of tests from the filterFunctions, if any fails, the row is rejected
         """
-        date = self.sourceModel().index(row, DAY, parent).data()
+        date = self.sourceModel().index(row, self.key_column, parent).data()
         if date is None:
             return False
-        date = date.date()
+
+        if isinstance(date, QtCore.QDateTime):
+            date = date.date()
 
         if self.mode == "single":
             return date == self.single_date
@@ -206,13 +215,17 @@ class CalculusModel(QtGui.QIdentityProxyModel):
                 total_seconds += in_.secsTo(out)
             worked_time = QtCore.QTime(0, 0, 0).addSecs(
                 total_seconds)
-
+            # TODO definir si el dia es festivo o regular
+            date = self.data(self.sourceModel().index(row, DAY))
+            print(date)
             relative_time = QtCore.QTime(8, 0, 0).secsTo(worked_time)
             if relative_time > 0:
+                # TODO agregar si el dia es feriado
                 extra_time = QtCore.QTime(0, 0, 0).addSecs(relative_time)
                 absent_time = QtCore.QTime(0, 0, 0)
             else:
                 extra_time = QtCore.QTime(0, 0, 0)
+                # TODO no agregar si el el dia es feriado
                 absent_time = QtCore.QTime(0, 0, 0).addSecs(- relative_time)
 
             self.calculations.append(
@@ -255,7 +268,7 @@ class TotalizeModel(QtCore.QAbstractTableModel):
             else:
                 return Qt.AlignLeft | Qt.AlignVCenter
 
-        return None
+        return QtCore.QAbstractTableModel.data(index, role)
 
     def headerData(self, section, orientation, role=None):
         if role == Qt.TextAlignmentRole:
@@ -272,6 +285,8 @@ class TotalizeModel(QtCore.QAbstractTableModel):
                 return 'Tiempo\nExtra'
             elif section == 3:
                 return 'Tiempo\nAusente'
+
+        return QtCore.QAbstractTableModel.headerData(section, orientation, role)
 
 
 def TotalizeWorkedTime(model):

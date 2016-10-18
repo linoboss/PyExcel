@@ -2,8 +2,6 @@ import sys
 from PyQt4 import uic
 from PyQt4 import QtGui, QtSql, QtCore
 import assets.sql as sql
-import assets.helpers as helpers
-import assets.work_day_tools as tool
 
 # Uic Loader
 qtCreatorFile = "ui\\workersview.ui"
@@ -37,7 +35,7 @@ class Workersview_controller(Ui_MainWindow, QtBaseClass):
         for hc in chain(range(3, 28), range(29, 40)):
             self.tableView.hideColumn(hc)
         self.tableView.setSelectionMode(QtGui.QTableView.SingleSelection)
-        self.tableView.setSelectionBehavior(QtGui.QTableView.SelectItems)
+        self.tableView.setSelectionBehavior(QtGui.QTableView.SelectRows)
 
     @QtCore.pyqtSlot()
     def on_qadd_clicked(self):
@@ -47,9 +45,31 @@ class Workersview_controller(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qdelete_clicked(self):
-        from deleteworkerview_controller import DeleteWorkerView_controller
-        dwv_c = DeleteWorkerView_controller(self)
-        dwv_c.exec()
+        return
+        # TODO probar si ya funciona
+        userinfo_model = self.tableView.model()
+        selection = self.tableView.selectionModel()
+        row = selection.currentIndex().row()
+        worker_id = userinfo_model.index(row, 0).data()
+
+        workdays_model = QtSql.QSqlTableModel()
+        workdays_model.setTable("WorkDays")
+        workdays_model.setFilter("worker = '{}'".format(worker_id))
+        workdays_model.select()
+        print(workdays_model.rowCount(), worker_id)
+        for row in range(workdays_model.rowCount()):
+            workdays_model.removeRow(row)
+        workdays_model.submitAll()
+
+        usershift_model = QtSql.QSqlTableModel()
+        usershift_model.setTable("UserShift")
+        usershift_model.setFilter("Userid = '{}'".format(worker_id))
+        usershift_model.select()
+        usershift_model.removeRow(0)
+        usershift_model.submitAll()
+
+        userinfo_model.removeRow(row)
+        userinfo_model.submitAll()
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):
