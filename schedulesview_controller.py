@@ -49,6 +49,11 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         proxymodel = QtGui.QSortFilterProxyModel(self)
         proxymodel.setSourceModel(model)
         proxymodel.setFilterKeyColumn(0)
+        proxymodel.setFilterRegExp(
+            self.filter_arg(
+                str(model.index(0, 0).data())
+            )
+        )
 
         # self.tableView = QtGui.QTableView()
         self.tableView.setModel(proxymodel)
@@ -64,6 +69,13 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         model = self.listView.model()
         schid = model.index(index.row(), 0).data()
 
+        regex_filter = self.filter_arg(schid)
+
+        proxymodel = self.tableView.model()
+        proxymodel.setFilterRegExp(regex_filter)
+
+    @staticmethod
+    def filter_arg(schid):
         schtime_table = QtSql.QSqlTableModel()
         schtime_table.setTable("SchTime")
         schtime_table.select()
@@ -80,11 +92,7 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         options = list(set(list_))
         items = list(map(lambda x: str(x[1]), options))
         regex_filter = '|'.join(items)
-
-        proxymodel = self.tableView.model()
-        proxymodel.setFilterRegExp(regex_filter)
-
-
+        return regex_filter
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):
@@ -107,7 +115,6 @@ class CustomDelegate(QtGui.QStyledItemDelegate):
 
     def createEditor(self, parent, option, index):
         column = index.column()
-        item = index.model().data(index)
         if column == TIMENAME:
             return QtGui.QTextEdit(parent)
         else:

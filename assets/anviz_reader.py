@@ -69,6 +69,7 @@ class AnvizReader:
             from_date = self.anvRgs.min_date_of("Checkinout")
 
         self.anvRgs.deleteDay(from_date)
+        self.anvRgs.deleteDay(from_date)
 
         to_date = self.anvRgs.max_date_of("Checkinout")
         """

@@ -1,6 +1,6 @@
 import sys
 from PyQt4.QtCore import Qt
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, QtSql
 import assets.helpers as helpers
 import assets.sql as sql
 import assets.work_day_tools as tool
@@ -147,11 +147,13 @@ class PrintReport(QtCore.QObject):
                                 item = '--:--'
                             else:
                                 item = qdate.toString("hh:mm")
-                        elif column >= self.WDH["workedtime"]:
+                        elif 10 <= column <= 12:
                             item = printFilter.index(row, column).data().toString('hh:mm')
                         else:
                             item = printFilter.index(row, column).data()
                         html += "<td align=center style='{}'>".format(not_css["td"])
+                        print(self.WDH)
+                        print(column, item)
                         html += item
                         html += "</td>"
 
@@ -303,3 +305,45 @@ class PrintReport(QtCore.QObject):
         elif mode == 'totals':
             self.totalsDoc()
         self.createFile()
+
+
+if __name__ == "__main__":
+
+    app = QtGui.QApplication(sys.argv)
+    a = sql.AnvizRegisters()
+
+    model = QtSql.QSqlRelationalTableModel()
+    model.setTable('WorkDays')
+    model.setRelation(model.fieldIndex("id"),
+                      QtSql.QSqlRelation("Userinfo",
+                                         "Userid",
+                                         "Name"))
+    model.setRelation(model.fieldIndex("day"),
+                      QtSql.QSqlRelation("Schedule",
+                                         "Schid",
+                                         "Schname"))
+
+    model.sort(model.fieldIndex("day"), Qt.AscendingOrder)
+    model.select()
+
+    while model.canFetchMore():
+        model.fetchMore()
+
+    calculusModel = tool.CalculusModel()
+    calculusModel.setSourceModel(model)
+    calculusModel.calculateWorkedHours()
+
+    scheduleFilter = QtGui.QSortFilterProxyModel()
+    scheduleFilter.setSourceModel(calculusModel)
+    scheduleFilter.setFilterCaseSensitivity(Qt.CaseInsensitive)
+    scheduleFilter.setFilterKeyColumn(model.fieldIndex("shift"))
+
+    dateFilter = tool.DateFilterProxyModel()
+    dateFilter.setSourceModel(scheduleFilter)
+
+    print_report = PrintReport()
+    print_report.setup(mode="allWorkers")
+    print_report.setSourceModel(dateFilter)
+    print_report.load_and_create_file()
+    self.documentCreated()
+

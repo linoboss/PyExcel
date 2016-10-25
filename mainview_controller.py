@@ -176,11 +176,12 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_printTotals_clicked(self):
+        model = self.tableView.model()
         print_report = PrintReport(self)
         if print_report.setOutputFileName() == print_report.CANCELED:
             return
         print_report.setup(mode="totals")
-        print_report.setSourceModel(self.dateFilter)
+        print_report.setSourceModel(model)
         print_report.load_and_create_file()
         self.documentCreated()
         QtGui.QApplication.processEvents()
