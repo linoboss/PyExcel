@@ -69,11 +69,39 @@ class Start:
             else:
                 self.close()
 
+        # Si no existe, crear tabla para tipos de dias libre
+        if anvRgs.tableExists("WorkerPassTypes"):
+            text = "Tabla WorkerPassTypes existente"
+        else:
+            anvRgs.createTable("WorkerPassTypes")
+            if anvRgs.query_failed():
+                helpers.PopUps.error_message("Error creando la tabla\nWorkerPassTypes",
+                                             detailedtext=anvRgs.howthequerydid())
+                self.close()
+            text = "Tabla WorkerPassTypes creada"
+        self.startDlg.setText(text)
+
+        # Si no existe, crear la tabla de dias libre
+        if anvRgs.tableExists("WorkerPass"):
+            text = "Tabla WorkerPass existente"
+        else:
+            anvRgs.createTable("WorkerPass")
+            if anvRgs.query_failed():
+                helpers.PopUps.error_message("Error creando la tabla\nWorkerPass",
+                                             detailedtext=anvRgs.howthequerydid())
+                self.close()
+            text = "Tabla WorkerPass creada"
+        self.startDlg.setText(text)
+
         # revisar la existencia de la tabla WorkDays
         if anvRgs.tableExists("WorkDays"):
             text = "Tabla WorkDays existente"
         else:
             anvRgs.createTable("WorkDays")
+            if anvRgs.query_failed():
+                helpers.PopUps.error_message("Error creando la tabla\nWorkDays",
+                                             detailedtext=anvRgs.howthequerydid())
+                self.close()
             text = "Tabla WorkDays creada"
         self.startDlg.setText(text)
 
@@ -142,6 +170,10 @@ class Start:
 
 if __name__ == "__main__":
     start = Start()
+    """
+    from assets.sql import AnvizRegisters
+    AnvizRegisters().deleteRegistersFrom('WorkDays')
+    """
     QtGui.QApplication.processEvents()
     start.tests()
     QtGui.QApplication.processEvents()

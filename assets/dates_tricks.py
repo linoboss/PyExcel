@@ -29,6 +29,10 @@ class MyDates:
         return DIAS_SEMANA[calendar.weekday(y, m, d)]
 
     @staticmethod
+    def dayNumber(y=1, m=1, d=1):
+        return calendar.weekday(y, m, d)
+
+    @staticmethod
     def fechaActual():
         return dt.datetime.now().date()
 

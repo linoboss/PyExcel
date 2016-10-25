@@ -3,6 +3,7 @@ from PyQt4 import uic
 from PyQt4 import QtGui, QtSql, QtCore
 import assets.sql as sql
 from assets.work_day_tools import DateFilterProxyModel
+from assets.dates_tricks import MyDates as md
 
 
 # Uic Loader
@@ -47,9 +48,12 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
         self.qoption.setCurrentIndex(INITIAL_INDEX)
         self.stackedWidget.setCurrentIndex(INITIAL_INDEX)
 
+        # tableView Setup
+        self.tableView.resizeColumnsToContents()
+
     @QtCore.pyqtSlot("QModelIndex")
     def on_tableView_clicked(self, index):
-        self.mapper.setCurrentModelIndex(index)
+        pass
 
     @QtCore.pyqtSlot("QString")
     def on_qoption_currentIndexChanged(self):
@@ -59,72 +63,49 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qadd_to_database_clicked(self):
-        row = self.mapper.currentIndex()
-        model = self.mapper.model().sourceModel().sourceModel()
+        model = self.mapper.model()
 
         option = self.stackedWidget.currentIndex()
         if option == 2:
             self.qdayofftype.setValue(2)
         elif option == 3:
             self.qdayofftype.setValue(1)
-        if self.mapper.currentIndex() == model.rowCount() - 1:
-            # Creation
-            self.qname.setText(
-                self.selectedWorkerid()
-            )
-            self.mapper.submit()
-            model.submitAll()
-            model.select()
-            row = model.rowCount()
-            model.insertRow(row)
-        else:
-            # Edition
-            model.select()
-            for i in range(1, 6):
-                widget = self.mapper.mappedWidgetAt(i)
-                item = None
-                if isinstance(widget, QtGui.QDateEdit):
-                    item = widget.date()
-                elif isinstance(widget, QtGui.QLineEdit):
-                    item = widget.text()
-                elif isinstance(widget, QtGui.QSpinBox):
-                    item = widget.value()
-                elif isinstance(widget, QtGui.QComboBox):
-                    item = widget.currentText()
-                elif isinstance(widget, QtGui.QTextEdit):
-                    item = widget.toPlainText()
-                index = model.index(row, i)
-                model.setData(index, item)
 
-            model.submitAll()
-            row = model.rowCount()
-            model.insertRow(row)
+        # Creation
+        self.qname.setText(
+            self.selectedWorkerid()
+        )
+        self.mapper.submit()
+        model.submitAll()
+        model.addRow()
+        self.mapper.toLast()
 
-        self.mapper.setCurrentIndex(row)
+        self.tableView.resizeColumnsToContents()
 
     @QtCore.pyqtSlot()
     def on_qdelete_clicked(self):
-        row = self.mapper.currentIndex()
-        basemodel = self.mapper.model().sourceModel().sourceModel()
         model = self.mapper.model()
-        basemodel.select()
-        model.removeRow(row)
-        basemodel.submitAll()
-        basemodel.select()
-        basemodel.insertRow(basemodel.rowCount())
+        deleterows = []
+        for index in self.tableView.selectedIndexes():
+            row = model.sourceIndex(index).row()
+            if row not in deleterows:
+                deleterows.append(row)
+        model.select()
+
+        for row in deleterows:
+            model.removeRow(row)
+        model.submitAll()
+        model.addRow()
         self.mapper.toLast()
 
+        self.tableView.resizeColumnsToContents()
+
     def setupMapper_(self, option):
-        model = QtSql.QSqlRelationalTableModel()
-        model.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
-        proxy1 = DateFilterProxyModel()
-        proxy1.setSourceModel(model)
-        proxy2 = QtGui.QSortFilterProxyModel()
-        proxy2.setSourceModel(proxy1)
+        model = DaysoffModel(self)
 
         if option == 0:
             model.setTable('Holiday')
-            self.mapper.setModel(proxy2)
+            self.mapper.setModel(model)
             # National date
             mapperList = ((self.qhname, 1),
                           (self.qhdate, 2),
@@ -133,7 +114,7 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
         elif option == 1:
             # Special date
             model.setTable('Holiday')
-            self.mapper.setModel(proxy2)
+            self.mapper.setModel(model)
             mapperList = ((self.qh2name, 1),
                           (self.qh2date, 2),
                           (self.qh2days, 3))
@@ -145,7 +126,7 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
                               QtSql.QSqlRelation(
                                   "Userinfo",
                                   "Userid", "Name"))
-            self.mapper.setModel(proxy2)
+            self.mapper.setModel(model)
             mapperList = ((self.qname, 1),
                           (self.qwpbdate, 2),
                           (self.qwptdate, 3),
@@ -159,7 +140,7 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
                               QtSql.QSqlRelation(
                                   "Userinfo",
                                   "Userid", "Name"))
-            self.mapper.setModel(proxy2)
+            self.mapper.setModel(model)
             mapperList = ((self.qname, 1),
                           (self.qvacbdate, 2),
                           (self.qvactdate, 3),
@@ -172,17 +153,14 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
         for k, v in mapperList:
             self.mapper.addMapping(k, v)
 
-        model.select()
-        row = model.rowCount()
-        model.insertRow(row)
-        self.mapper.setCurrentIndex(row)
-        self.tableView.setModel(proxy2)
+        model.addRow()
+        self.mapper.toLast()
+        self.tableView.setModel(model.filtered)
 
     def setupTable_(self, option):
-        # self.tableView = QtGui.QTableView()
-        typeproxy = self.tableView.model()
-        dateproxy = typeproxy.sourceModel()
-        model = dateproxy.sourceModel()
+        model = self.mapper.model()
+        for i in range(model.columnCount()):
+            self.tableView.setItemDelegateForColumn(i, QtGui.QStyledItemDelegate(self))
 
         if option == 0:  # Fecha nacional
             hidden_columns = (model.fieldIndex("Holidayid"),
@@ -195,9 +173,12 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
                                  (model.fieldIndex("BDate"),
                                   QtCore.Qt.Horizontal,
                                   "Fecha"))
-            dateproxy.setFilterKeyColumn(model.fieldIndex("BDate"))
-            dateproxy.setRangeDateFilter(QtCore.QDate(2000, 1, 1),
-                                         QtCore.QDate(2000, 12, 31))
+            model.setFilterDateColumn(model.fieldIndex("BDate"))
+            model.setRangeDateFilter(QtCore.QDate(2000, 1, 1),
+                                     QtCore.QDate(2000, 12, 31))
+            self.tableView.setItemDelegateForColumn(model.fieldIndex("BDate"),
+                                                    DateColumnDelegate(self, "day and month"))
+
         elif option == 1:  # Fecha especial
             hidden_columns = (model.fieldIndex("Holidayid"),)
             visible_columns = (model.fieldIndex("Name"),
@@ -213,9 +194,11 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
                                   QtCore.Qt.Horizontal,
                                   "Dias"))
 
-            dateproxy.setFilterKeyColumn(model.fieldIndex("BDate"))
-            dateproxy.setRangeDateFilter(QtCore.QDate(2001, 1, 1),
-                                         QtCore.QDate(2040, 1, 1))
+            model.setFilterDateColumn(model.fieldIndex("BDate"))
+            model.setRangeDateFilter(QtCore.QDate(2001, 1, 1),
+                                     QtCore.QDate(2100, 1, 1))
+            self.tableView.setItemDelegateForColumn(model.fieldIndex("BDate"),
+                                                    DateColumnDelegate(self))
 
         elif option == 2:  # Dias libres
             hidden_columns = (model.fieldIndex("WPid"),
@@ -237,12 +220,16 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
                                   QtCore.Qt.Horizontal,
                                   "Caracteristica"))
 
-            typeproxy.setFilterKeyColumn(model.fieldIndex('type'))
-            typeproxy.setFilterRegExp('2')
+            model.setFilterStringColumn(model.fieldIndex('type'))
+            model.setFilterString('2')
+            self.tableView.setItemDelegateForColumn(model.fieldIndex("BDate"),
+                                                    DateColumnDelegate(self))
+            self.tableView.setItemDelegateForColumn(model.fieldIndex("TDate"),
+                                                    DateColumnDelegate(self))
 
         elif option == 3:  # Vacaciones
             hidden_columns = (model.fieldIndex("Vacid"),
-                              model.fieldIndex("Caract"),
+                              model.fieldIndex("Description"),
                               model.fieldIndex("Type"))
             visible_columns = (model.fieldIndex("Name"),
                                model.fieldIndex("BDate"),
@@ -259,20 +246,25 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
                                  (model.fieldIndex("Carat"),
                                   QtCore.Qt.Horizontal,
                                   "Caracteristica"))
-            typeproxy.setFilterKeyColumn(model.fieldIndex('type'))
-            typeproxy.setFilterRegExp('1')
+            model.setFilterStringColumn(model.fieldIndex('type'))
+            model.setFilterString('1')
+            self.tableView.setItemDelegateForColumn(model.fieldIndex("BDate"),
+                                                    DateColumnDelegate(self))
+            self.tableView.setItemDelegateForColumn(model.fieldIndex("TDate"),
+                                                    DateColumnDelegate(self))
 
         else:
             hidden_columns = []
             visible_columns = []
             model_header_data = []
-
         for column in hidden_columns:
             self.tableView.hideColumn(column)
         for column in visible_columns:
             self.tableView.showColumn(column)
         for header_data in model_header_data:
             model.setHeaderData(*header_data)
+
+        self.tableView.resizeColumnsToContents()
 
     def selectedWorkerid(self):
         option = self.stackedWidget.currentIndex()
@@ -283,8 +275,99 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
             index = self.qvacworker.currentIndex()
             model = self.qvacworker.model()
         else:
-            raise IndexError
+            return ""
         return model.index(index, 0).data()
+
+
+class DaysoffModel(QtSql.QSqlRelationalTableModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
+        self.dateFilter = DateFilterProxyModel(parent)
+        self.dateFilter.setSourceModel(self)
+        self.stringFilter = QtGui.QSortFilterProxyModel(parent)
+        self.stringFilter.setSourceModel(self.dateFilter)
+
+    @property
+    def filtered(self):
+        return self.stringFilter
+
+    def setFilterDateColumn(self, column):
+        self.dateFilter.setFilterKeyColumn(column)
+
+    def setFilterStringColumn(self, column):
+        self.stringFilter.setFilterKeyColumn(column)
+
+    def setRangeDateFilter(self, bdate, tdate):
+        self.dateFilter.setRangeDateFilter(bdate, tdate)
+
+    def setFilterString(self, string):
+        self.stringFilter.setFilterRegExp(string)
+
+    def addRow(self):
+        self.select()
+        row = self.rowCount()
+        self.insertRow(row)
+        return row
+
+    def sourceIndex(self, index):
+        source_index = \
+            self.dateFilter.mapToSource(
+                self.stringFilter.mapToSource(index))
+        return source_index
+
+
+class DateColumnDelegate(QtGui.QStyledItemDelegate):
+    def __init__(self, parent=None, format="yyyy-MM-dd"):
+        super().__init__(parent)
+        self.format = format
+
+    def createEditor(self, parent, option, index):
+        dateedit = QtGui.QDateEdit(parent)
+        dateedit.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        if self.format == "day and month":
+            dateedit.setDisplayFormat("dd-MM")
+        else:
+            dateedit.setDisplayFormat("dd-MM-yyyy")
+        dateedit.setCalendarPopup(True)
+        return dateedit
+
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, QtCore.Qt.DisplayRole)
+        if isinstance(value, QtCore.QDateTime):
+            value = value.date()
+        editor.setDate(value)
+
+    def setModelData(self, editor, model, index):
+        model.setData(index, editor.date())
+
+    def paint(self, painter, option, index):
+        document = QtGui.QTextDocument()
+        item = index.data()
+        color = QtGui.QColor(255, 255, 255)
+
+        if isinstance(item, QtCore.QDateTime):
+            item = item.date()
+
+        if isinstance(item, QtCore.QDate):
+            if self.format == "day and month":
+                date = item.toPyDate()
+                text = '{} de {}'.format(date.day,
+                                         md.monthName(date.month))
+            else:
+                text = item.toString(self.format)
+        else:
+            text = str(item)
+
+        painter.save()
+        painter.fillRect(option.rect, color)
+        painter.translate(option.rect.x(), option.rect.y())
+        document.setHtml(text)
+        document.drawContents(painter)
+        painter.restore()
+
+    def sizeHint(self, option, index):
+        return QtCore.QSize(100, 20)
 
 
 if __name__ == "__main__":

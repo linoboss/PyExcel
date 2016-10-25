@@ -141,9 +141,9 @@ class AnvizRegisters:
         if name == "WorkDays":
             self.query.exec("CREATE TABLE WorkDays "
                             "("
-                            "workdayid AUTOINCREMENT, "
+                            "workdayid AUTOINCREMENT PRIMARY KEY, "
                             "day DATE NOT NULL, "
-                            "worker VARCHAR(50) REFERENCES Userinfo(Userid), "
+                            "worker VARCHAR(255) REFERENCES Userinfo(Userid), "
                             "InTime_1 DATETIME, "
                             "OutTime_1 DATETIME, "
                             "InTime_2 DATETIME, "
@@ -151,8 +151,24 @@ class AnvizRegisters:
                             "InTime_3 DATETIME, "
                             "OutTime_3 DATETIME, "
                             "shift INTEGER REFERENCES Schedule(Schid), "
-                            "status INTEGER"
-                            ""
+                            "Holidayid INTEGER REFERENCES Holiday(Holidayid), "
+                            "WPid INTEGER REFERENCES WorkerPass(WPid)"
+                            ")")
+        elif name == "WorkerPass":
+            self.query.exec("CREATE TABLE WorkerPass "
+                            "("
+                            "WPid AUTOINCREMENT PRIMARY KEY, "
+                            "Userid VARCHAR(255) REFERENCES Userinfo(Userid), "
+                            "BDate DATETIME, "
+                            "TDate DATETIME, "
+                            "Description VARCHAR(255), "
+                            "Type INTEGER "
+                            ")")
+        elif name == "WorkerPassTypes":
+            self.query.exec("CREATE TABLE WorkerPassTypes "
+                            "("
+                            "Id AUTOINCREMENT PRIMARY KEY, "
+                            "Type VARCHAR(255)"
                             ")")
         else:
             raise KeyError(name + ' is not a valid option')
@@ -336,8 +352,8 @@ class AnvizRegisters:
         if table == "WorkDays":
             self.query.prepare("INSERT INTO WorkDays ("
                                "    day, worker, InTime_1, OutTime_1, InTime_2, "
-                               "    OutTime_2, InTime_3 , OutTime_3, shift) "
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                               "    OutTime_2, InTime_3 , OutTime_3, shift, holidayid, WPid) "
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
             for i, value in enumerate(args):
                 self.query.bindValue(i, value)
             self.query.exec_()
@@ -389,7 +405,12 @@ class AnvizRegisters:
                             "FROM WorkDays")
 
             self.query.next()
-            max_date = max([self.query.value(i) for i in range(6)])
+
+            values = [self.query.value(i) for i in range(6)]
+            if all([v is None for v in values]):
+                return None
+
+            max_date = max(values)
             if max_date == QtCore.QDateTime():
                 return None
             else:
@@ -437,6 +458,12 @@ class AnvizRegisters:
 
     def next(self):
         return self.query.next()
+
+    def query_failed(self):
+        if self.query.lastError().number() == -1:
+            return False
+        else:
+            return True
 
     def refreshConnection(self):
         self.__connect()
@@ -519,6 +546,7 @@ class AnvizRegisters:
         return schmap
 
     def tableExists(self, name):
+        print(name, self.db.tables(), name in self.db.tables())
         return name in self.db.tables()
 
     def value(self, i):

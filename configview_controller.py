@@ -26,9 +26,13 @@ class ScheduleConfiguration_Controller(Ui_MainWindow, QtBaseClass):
     def on_changeDB_clicked(self):
         filename = \
             QtGui.QFileDialog.getOpenFileName(
-                self, "Seleccionar archivo Access")
+                self,
+                "Seleccionar archivo Access",
+                sql.ConfigFile().get("database_path"),
+                "Access Database (*.mdb)"
+            )
 
-        if filename is not None:
+        if filename:
             sql.ConfigFile().set(
                 "database_path", filename
             )

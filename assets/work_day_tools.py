@@ -1,9 +1,7 @@
-import sys
-from PyQt4 import uic
 from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, QtGui, QtSql
 from assets.dates_tricks import MyDates as md
-import datetime as dt
+from assets import helpers
 
 (ID, DAY, WORKER,
  INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3,
@@ -13,12 +11,22 @@ import datetime as dt
 class WorkDayDelegate(QtGui.QStyledItemDelegate):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.holiday = {}
+        self.workerpass = {}
+
+        self.shift_map = {"Diurno": 4, "Nocturno": 2}
+        self.week_workable_days = helpers.week_workable_days()
+        self.holiday = helpers.table_to_dictionary("Holiday", 0)
+        self.workerpass = helpers.table_to_dictionary("WorkerPass", 0)
 
     def paint(self, painter, option, index):
         document = QtGui.QTextDocument()
         column = index.column()
-        item = index.model().data(index)
+        row = index.row()
+        model = index.model()
+        item = model.data(index)
 
+        # Configuration by Column
         color = QtGui.QColor(255, 255, 255)
         if column == DAY:
             if item.date().day() % 2 == 0:
@@ -36,8 +44,33 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
             text = item.toString("hh:mm")
         elif isinstance(item, QtCore.QTime):
             text = item.toString('hh:mm')
+        elif column == 13:
+            text = str(self.holiday[item][1]) if isinstance(item, int) else ''
+        elif column == 14:
+            if isinstance(item, int):
+                if self.workerpass[item][-1] == 2:
+                    text = self.workerpass[item][-2]
+                else:
+                    text = "Vacaciones"
+            else:
+                text = ''
         else:
             text = str(item)
+
+        # Configuration by Row
+        date = model.index(row, DAY).data().date()
+        day_number = md.dayNumber(date.year(), date.month(), date.day())
+        shift = self.shift_map[model.index(row, SHIFT).data()]
+        isnotregular = day_number not in self.week_workable_days[shift]
+        isholiday = isinstance(model.index(row, 13).data(), int)
+        isdayoff = isinstance(model.index(row, 14).data(), int)
+
+        if isdayoff:
+            color = QtGui.QColor(220, 255, 220)
+        elif isholiday:
+            color = QtGui.QColor(255, 255, 200)
+        elif isnotregular:
+            color = QtGui.QColor(240, 240, 240)
 
         painter.save()
         painter.fillRect(option.rect, color)
@@ -132,6 +165,11 @@ class CalculusModel(QtGui.QIdentityProxyModel):
         super().__init__(parent)
         self.calculations = []
 
+        self.shift_map = {"Diurno": 4, "Nocturno": 2}
+        self.week_workable_days = helpers.week_workable_days()
+        self.holiday = helpers.table_to_dictionary("Holiday", 0)
+        self.workerpass = helpers.table_to_dictionary("WorkerPass", 0)
+
     def columnCount(self, QModelIndex_parent=None, *args, **kwargs):
         return self.sourceModel().columnCount()
 
@@ -166,6 +204,10 @@ class CalculusModel(QtGui.QIdentityProxyModel):
                 return "Tiempo\nExtra"
             elif section == ABSENT_TIME:
                 return "Tiempo\nAusente"
+            elif section == 13:
+                return "Fecha\nEspecial"
+            elif section == 14:
+                return "Permiso\nLaboral"
         return str(section)
 
     def data(self, index, role=None):
@@ -215,18 +257,32 @@ class CalculusModel(QtGui.QIdentityProxyModel):
                 total_seconds += in_.secsTo(out)
             worked_time = QtCore.QTime(0, 0, 0).addSecs(
                 total_seconds)
-            # TODO definir si el dia es festivo o regular
-            date = self.data(self.sourceModel().index(row, DAY))
-            print(date)
+
+            date = self.sourceModel().index(row, DAY).data()
+            shift = self.shift_map[self.sourceModel().index(row, SHIFT).data()]
+            specialdate = self.sourceModel().index(row, 13).data()
+            workerpass = self.sourceModel().index(row, 14).data()
+            dayisregular = True
+            day_number = md.dayNumber(date.date().year(), date.date().month(), date.date().day())
+
+            # Non workable day conditions
+            if day_number not in self.week_workable_days[shift]:
+                dayisregular = False
+            if isinstance(specialdate, int) or isinstance(workerpass, int):
+                dayisregular = False
+
+            # base calculus values
             relative_time = QtCore.QTime(8, 0, 0).secsTo(worked_time)
-            if relative_time > 0:
-                # TODO agregar si el dia es feriado
-                extra_time = QtCore.QTime(0, 0, 0).addSecs(relative_time)
-                absent_time = QtCore.QTime(0, 0, 0)
+            extra_time = QtCore.QTime(0, 0, 0)
+            absent_time = QtCore.QTime(0, 0, 0)
+
+            if dayisregular:
+                if relative_time > 0:
+                    extra_time = QtCore.QTime(0, 0, 0).addSecs(relative_time)
+                else:
+                    absent_time = QtCore.QTime(0, 0, 0).addSecs(- relative_time)
             else:
-                extra_time = QtCore.QTime(0, 0, 0)
-                # TODO no agregar si el el dia es feriado
-                absent_time = QtCore.QTime(0, 0, 0).addSecs(- relative_time)
+                extra_time = QtCore.QTime(0, 0, 0).addSecs(total_seconds)
 
             self.calculations.append(
                 [worked_time, extra_time, absent_time]
@@ -268,7 +324,7 @@ class TotalizeModel(QtCore.QAbstractTableModel):
             else:
                 return Qt.AlignLeft | Qt.AlignVCenter
 
-        return QtCore.QAbstractTableModel.data(index, role)
+        return None
 
     def headerData(self, section, orientation, role=None):
         if role == Qt.TextAlignmentRole:
@@ -286,7 +342,7 @@ class TotalizeModel(QtCore.QAbstractTableModel):
             elif section == 3:
                 return 'Tiempo\nAusente'
 
-        return QtCore.QAbstractTableModel.headerData(section, orientation, role)
+        return None
 
 
 def TotalizeWorkedTime(model):
@@ -334,5 +390,3 @@ def secondsToTime(seconds):
             return secToTime(workdays, hours, mins + 1, secs - 60)
 
     return secToTime(secs=seconds)
-
-

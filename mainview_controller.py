@@ -110,6 +110,10 @@ class MainView(Ui_MainWindow, QtBaseClass):
             from workersview_controller import Workersview_controller
             checkioview = Workersview_controller(self)
             checkioview.exec()
+        elif action is self.action_daysoff:
+            from daysoffview_controller import Daysoffview_controller
+            daysoff_view = Daysoffview_controller(self)
+            daysoff_view.exec()
         else:
             helpers.PopUps.inform_user("not implemented!")
 

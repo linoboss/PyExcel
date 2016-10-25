@@ -1,7 +1,6 @@
 import sys, os
 from PyQt4 import QtGui, QtCore, QtSql
 from assets.dates_tricks import MyDates as md
-import assets.sql as sql
 
 YES = QtGui.QMessageBox.Yes
 NO = QtGui.QMessageBox.No
@@ -28,9 +27,11 @@ class PopUps:
         messageBox.exec()
 
     @staticmethod
-    def error_message(text):
+    def error_message(text, infotext='', detailedtext=''):
         messageBox = QtGui.QMessageBox()
         messageBox.setText(text)
+        messageBox.setInformativeText(infotext)
+        messageBox.setDetailedText(detailedtext)
         messageBox.setStandardButtons(QtGui.QMessageBox.Ok)
         messageBox.setIcon(QtGui.QMessageBox.Warning)
         messageBox.exec()
@@ -150,64 +151,94 @@ def regularWorkDays():
     return sch_reg_days
 
 
-def holydays():
+def holidays():
     table = QtSql.QSqlRelationalTableModel()
     table.setTable("Holiday")
     table.select()
-    hd = {}
+    holiday = {}
+    specialevent = {}
     for row in range(table.rowCount()):
+        id_ = table.record(row).value("Holidayid")
         name = table.record(row).value("Name")
-        date = table.record(row).value("BDate")
+        date = table.record(row).value("BDate").date()
         days = table.record(row).value("Days")
         for d in range(days):
-            hd[date] = name
+            if date.year() == 2000:
+                holiday[date] = id_
+            else:
+                specialevent[date] = id_
             date = date.addDays(1)
 
-    return hd
+    return holiday, specialevent
 
 
-def specialEvent():
-    table = QtSql.QSqlRelationalTableModel()
-    table.setTable("Holyday2")
-    table.select()
-    hd = {}
-    for row in range(table.rowCount()):
-        name = table.record(row).value("HName")
-        date = table.record(row).value("HDate")
-        days = table.record(row).value("Days")
-        isworkable = table.record(row).value("isWorkable")
-        for d in range(days):
-            hd[date] = (name, isworkable)
-            date = date.addDays(1)
-
-    return hd
-
-
-def workerPass(startdate):
+def workerPass():
     table = QtSql.QSqlRelationalTableModel()
     table.setTable("WorkerPass")
     table.select()
-    wp = {}
+    dayoff = {}
     for row in range(table.rowCount()):
-        wpid = table.record(row).value("WPid")
+        id_ = table.record(row).value("WPid")
         userid = table.record(row).value("Userid")
         bdate = table.record(row).value("BDate")
         tdate = table.record(row).value("TDate")
         description = table.record(row).value("Description")
+        type_ = table.record(row).value("Type")
         date = bdate
-        if userid not in wp:
-            wp[userid] = []
+
         datesrange = md.dates_range(bdate.toPyDateTime(),
                                     tdate.toPyDateTime())
+
+        if userid not in dayoff:
+            dayoff[userid] = {}
         for d in datesrange:
-            wp[userid].append((d, description))
+            dayoff[userid][QtCore.QDate(d)] = id_
             date = date.addDays(1)
 
-    return wp
+    return dayoff
+
+
+def table_to_dictionary(table, primary_key=0):
+    model = QtSql.QSqlTableModel()
+    model.setTable(table)
+    model.select()
+    model_dict = {}
+    for row in range(model.rowCount()):
+        key = model.record(row).value(primary_key)
+        value = []
+        for c in range(model.columnCount()):
+            value.append(model.index(row, c).data())
+        model_dict[key] = value
+    return model_dict
+
+
+def week_workable_days():
+    model = QtSql.QSqlTableModel()
+    model.setTable("SchTime")
+    model.select()
+    model_pair = []
+    for row in range(model.rowCount()):
+        key = model.record(row).value("Schid")
+        value = model.record(row).value("BeginDay") - 1
+        model_pair.append((key, value))
+    model_pair = list(set(model_pair))
+    model_dict = {}
+    for k, v in model_pair:
+        if k not in model_dict:
+            model_dict[k] = [v]
+        else:
+            model_dict[k].append(v)
+    return model_dict
 
 
 if __name__ == "__main__":
-    import assets.anviz_reader as av
+    from assets.sql import AnvizRegisters
+    from pprint import pprint
 
     app = QtGui.QApplication(sys.argv)
-    av.AnvizReader()
+    av = AnvizRegisters()
+
+    pprint(table_to_dictionary("WorkerPass", 0))
+
+
+

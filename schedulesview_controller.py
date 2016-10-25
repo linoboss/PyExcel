@@ -20,11 +20,25 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         self.setupUi(self)
         self.parent = parent
 
+        listmodel = QtSql.QSqlTableModel(self)
+        listmodel.setTable("Schedule")
+        listmodel.setEditStrategy(listmodel.OnFieldChange)
+        listmodel.select()
+        # QtGui.QListView().setColum
+        self.listView.setModel(listmodel)
+        self.listView.setModelColumn(1)
+
+        self.mapper = QtGui.QDataWidgetMapper(self)
+        self.mapper.setModel(listmodel)
+        self.mapper.addMapping(self.qisOvernight, 5)
+        self.mapper.setSubmitPolicy(QtGui.QDataWidgetMapper.AutoSubmit)
+        self.mapper.setCurrentIndex(0)
+
         model = QtSql.QSqlRelationalTableModel(self)
         model.setEditStrategy(QtSql.QSqlTableModel.OnFieldChange)
         model.setTable('TimeTable')
         model.select()
-        model.setHeaderData(TIMENAME, QtCore.Qt.Horizontal, "Nombre")
+        model.setHeaderData(TIMENAME, QtCore.Qt.Horizontal, "Turno")
         model.setHeaderData(INTIME, QtCore.Qt.Horizontal, "Entrada")
         model.setHeaderData(OUTTIME, QtCore.Qt.Horizontal, "Salida")
         model.setHeaderData(BINTIME, QtCore.Qt.Horizontal, "Inicio de\nEntrada")
@@ -32,13 +46,45 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         model.setHeaderData(BOUTTIME, QtCore.Qt.Horizontal, "Inicio de\nSalida")
         model.setHeaderData(EOUTTIME, QtCore.Qt.Horizontal, "Fin de la\nSalida")
 
+        proxymodel = QtGui.QSortFilterProxyModel(self)
+        proxymodel.setSourceModel(model)
+        proxymodel.setFilterKeyColumn(0)
+
         # self.tableView = QtGui.QTableView()
-        self.tableView.setModel(model)
+        self.tableView.setModel(proxymodel)
         self.tableView.setItemDelegate(CustomDelegate(self))
         for hc in (0, 8, 9, 10, 11, 12, 13, 14, 15):
             self.tableView.hideColumn(hc)
         self.tableView.setSelectionMode(QtGui.QTableView.SingleSelection)
         self.tableView.setSelectionBehavior(QtGui.QTableView.SelectItems)
+
+    @QtCore.pyqtSlot("QModelIndex")
+    def on_listView_clicked(self, index):
+        self.mapper.setCurrentModelIndex(index)
+        model = self.listView.model()
+        schid = model.index(index.row(), 0).data()
+
+        schtime_table = QtSql.QSqlTableModel()
+        schtime_table.setTable("SchTime")
+        schtime_table.select()
+        proxy_schtime_table = QtGui.QSortFilterProxyModel()
+        proxy_schtime_table.setSourceModel(schtime_table)
+        proxy_schtime_table.setFilterKeyColumn(0)
+        proxy_schtime_table.setFilterRegExp(str(schid))
+        list_ = []
+        for row in range(proxy_schtime_table.rowCount()):
+            list_.append((
+                proxy_schtime_table.index(row, 0).data(),
+                proxy_schtime_table.index(row, 2).data()
+            ))
+        options = list(set(list_))
+        items = list(map(lambda x: str(x[1]), options))
+        regex_filter = '|'.join(items)
+
+        proxymodel = self.tableView.model()
+        proxymodel.setFilterRegExp(regex_filter)
+
+
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):

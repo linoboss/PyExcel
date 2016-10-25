@@ -349,6 +349,7 @@ Trabajado</string>
     <addaction name="action_database"/>
     <addaction name="action_schedules"/>
     <addaction name="action_workers"/>
+    <addaction name="action_daysoff"/>
    </widget>
    <widget class="QMenu" name="menuVer">
     <property name="title">
@@ -378,6 +379,11 @@ Trabajado</string>
   <action name="action_workers">
    <property name="text">
     <string>Trabajadores</string>
+   </property>
+  </action>
+  <action name="action_daysoff">
+   <property name="text">
+    <string>Dias libres</string>
    </property>
   </action>
  </widget>

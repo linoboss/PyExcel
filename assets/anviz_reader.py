@@ -7,6 +7,7 @@ from assets.dates_tricks import MyDates as md
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 import assets.helpers as helpers
+from pprint import pprint
 
 schedules = ['Vespertino', 'Matutino', 'nocturno']
 work_time_reference = dt.timedelta(hours=8)
@@ -60,6 +61,8 @@ class AnvizReader:
             return self.anvRgs.getWorkers("shifts by id")
 
     def updateTable(self):
+        holiday, specialdate = helpers.holidays()
+        daysoff = helpers.workerPass()
         from_date = self.anvRgs.max_date_of("WorkDays")
 
         if from_date is None:
@@ -116,6 +119,21 @@ class AnvizReader:
                 if not self.anvRgs.next():
                     break
                 CheckDate = self.anvRgs.value(CHECKTIME).toPyDateTime().date()
+
+            # Add Holidays and SpecialDates
+            for userid in workday.keys():
+                date = QtCore.QDate(d)
+                # holidays
+                hdate = QtCore.QDate(2000, date.month(), date.day())
+                if hdate in holiday:
+                    workday[userid][9] = holiday[hdate]
+                # special dates
+                if date in specialdate:
+                    workday[userid][9] = specialdate[date]
+                # vacations and days off
+                if userid in daysoff:
+                    if date in daysoff[userid]:
+                        workday[userid][10] = daysoff[userid][date]
 
             workdays.append(workday)
         """
@@ -175,13 +193,13 @@ class AnvizReader:
         which includes all the workers and their logs that day
         :return: a dict with the structure of a work day
         """
-        INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3, SHIFT = [None for n in range(7)]
+        INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3, SHIFT, HOLIDAY, DAYOFF = [None for n in range(9)]
 
         day = QtCore.QDate(day)
         wd_temp = {}
         for w in self.workers_by_id:
             SHIFT = self.workers_shifts_id[w]
-            wd_temp[w] = [day, str(w), INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3, SHIFT]
+            wd_temp[w] = [day, str(w), INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3, SHIFT, HOLIDAY, DAYOFF]
 
         return wd_temp
 
@@ -217,7 +235,6 @@ def run():
 if __name__ == "__main__":    # run()
     from pprint import pprint
     app = QtGui.QApplication(sys.argv)
-
     reader = AnvizReader()
     # getShifts()
     # update()

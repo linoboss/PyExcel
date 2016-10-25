@@ -28,17 +28,25 @@ class Checkinoutview_Controller(Ui_MainWindow, QtBaseClass):
                               "Userid", "Name"))
         model.select()
 
-        name_filter = QtGui.QSortFilterProxyModel(self)
-        name_filter.setSourceModel(model)
+        self.dateFilter = tool.DateFilterProxyModel(self)
+        self.dateFilter.setSourceModel(model)
+        self.dateFilter.setFilterKeyColumn(model.fieldIndex("CheckTime"))
 
-        # self.tableView = QtGui.QTableView()
-        self.tableView.setModel(model)
+        self.tableView.setModel(self.dateFilter)
         self.tableView.setItemDelegate(CustomDelegate())
         for hc in (0, 3, 4, 5, 6, 7):
             self.tableView.hideColumn(hc)
         self.tableView.sortByColumn(CHECKTIME, QtCore.Qt.AscendingOrder)
         self.tableView.setSortingEnabled(True)
         self.tableView.adjustSize()
+
+    @QtCore.pyqtSlot("QDate")
+    def on_dateEdit_dateChanged(self, date):
+        self.dateFilter.setSingleDateFilter(date)
+
+    @QtCore.pyqtSlot()
+    def on_pushButton_clicked(self):
+        self.dateFilter.removeFilter()
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):
