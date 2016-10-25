@@ -85,6 +85,8 @@ class MainView(Ui_MainWindow, QtBaseClass):
         # set initial display tab
         self.tabWidget.setCurrentIndex(0)
 
+        self.tableView_total.setItemDelegate(tool.SizeDalegate(200, self))
+
     def ask_user_to_reopen_program(self):
         helpers.PopUps.inform_user("El programa cerrara automaticamente.\n"
                                    "Por favor, abralo nuevamente")
@@ -173,6 +175,7 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.tableView_total.setModel(
             tool.TotalizeWorkedTime(self.tableView.model())
         )
+        self.tableView_total.resizeColumnsToContents()
 
     @QtCore.pyqtSlot()
     def on_printTotals_clicked(self):

@@ -13,20 +13,29 @@
   <property name="windowTitle">
    <string>Agregar Trabajador</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QToolBox" name="toolBox">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>295</width>
-        <height>163</height>
+        <width>415</width>
+        <height>241</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <attribute name="label">
        <string>Datos Escenciales</string>
@@ -107,6 +116,9 @@
         <width>415</width>
         <height>241</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <attribute name="label">
        <string>Datos Personales</string>
@@ -207,9 +219,12 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>295</width>
-        <height>163</height>
+        <width>415</width>
+        <height>241</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <attribute name="label">
        <string>Datos de Trabajo</string>

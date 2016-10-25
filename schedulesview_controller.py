@@ -51,7 +51,7 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         proxymodel.setFilterKeyColumn(0)
         proxymodel.setFilterRegExp(
             self.filter_arg(
-                str(model.index(0, 0).data())
+                str(listmodel.index(0, 0).data())
             )
         )
 
@@ -90,6 +90,7 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
                 proxy_schtime_table.index(row, 2).data()
             ))
         options = list(set(list_))
+        print(options)
         items = list(map(lambda x: str(x[1]), options))
         regex_filter = '|'.join(items)
         return regex_filter

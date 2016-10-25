@@ -38,7 +38,13 @@ class Checkinoutview_Controller(Ui_MainWindow, QtBaseClass):
             self.tableView.hideColumn(hc)
         self.tableView.sortByColumn(CHECKTIME, QtCore.Qt.AscendingOrder)
         self.tableView.setSortingEnabled(True)
-        self.tableView.adjustSize()
+        self.tableView.resizeColumnsToContents()
+
+        self.dateEdit.setDate(
+            QtCore.QDate().currentDate()
+        )
+        self.dateFilter.removeFilter()
+
 
     @QtCore.pyqtSlot("QDate")
     def on_dateEdit_dateChanged(self, date):
@@ -67,7 +73,11 @@ class CustomDelegate(QtGui.QStyledItemDelegate):
         painter.restore()
 
     def sizeHint(self, option, index):
-        return QtCore.QSize(200, 20)
+        column = index.column()
+        if column == 1:
+            return QtCore.QSize(175, 20)
+        else:
+            return QtCore.QSize(125, 20)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

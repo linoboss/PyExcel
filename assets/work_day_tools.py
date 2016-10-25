@@ -390,3 +390,12 @@ def secondsToTime(seconds):
             return secToTime(workdays, hours, mins + 1, secs - 60)
 
     return secToTime(secs=seconds)
+
+
+class SizeDalegate(QtGui.QStyledItemDelegate):
+    def __init__(self, size, parent=None):
+        super().__init__(parent)
+        self.size = size
+
+    def sizeHint(self, options, index):
+        return QtCore.QSize(self.size, 20)
