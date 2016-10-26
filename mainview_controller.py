@@ -42,6 +42,8 @@ class MainView(Ui_MainWindow, QtBaseClass):
         while self.model.canFetchMore():
             self.model.fetchMore()
 
+        self.model.sort(1, Qt.DescendingOrder)
+
         self.calculusModel = tool.CalculusModel(self)
         self.calculusModel.setSourceModel(self.model)
         self.calculusModel.calculateWorkedHours()

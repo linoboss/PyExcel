@@ -6,14 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="9cd007d4-b0e2-4593-8089-14b8212ea817" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sandbox/Att2003.mdb" afterPath="$PROJECT_DIR$/sandbox/Att2003.mdb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/addworkerview.ui" afterPath="$PROJECT_DIR$/ui/addworkerview.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/schedulesview.ui" afterPath="$PROJECT_DIR$/ui/schedulesview.ui" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/assets/dates_tricks.py" afterPath="$PROJECT_DIR$/assets/dates_tricks.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/assets/printReport.py" afterPath="$PROJECT_DIR$/assets/printReport.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/assets/work_day_tools.py" afterPath="$PROJECT_DIR$/assets/work_day_tools.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/checkinoutview_controller.py" afterPath="$PROJECT_DIR$/checkinoutview_controller.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mainview_controller.py" afterPath="$PROJECT_DIR$/mainview_controller.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/schedulesview_controller.py" afterPath="$PROJECT_DIR$/schedulesview_controller.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/persistence/config.bak" afterPath="$PROJECT_DIR$/persistence/config.bak" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/persistence/config.dir" afterPath="$PROJECT_DIR$/persistence/config.dir" />
     </list>
     <ignored path="PyExcel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -32,14 +30,14 @@
     <favorites_list name="PyExcel" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.46072975">
+    <splitter split-orientation="horizontal" split-proportion="0.4742923">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="start.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/start.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2380">
-                  <caret line="140" column="27" selection-start-line="140" selection-start-column="27" selection-end-line="140" selection-end-column="27" />
+                <state relative-caret-position="119">
+                  <caret line="146" column="44" selection-start-line="146" selection-start-column="44" selection-end-line="146" selection-end-column="44" />
                   <folding>
                     <element signature="e#0#14#0" expanded="true" />
                   </folding>
@@ -47,11 +45,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="printReport.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="printReport.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/assets/printReport.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4879">
-                  <caret line="287" column="54" selection-start-line="287" selection-start-column="54" selection-end-line="287" selection-end-column="54" />
+                <state relative-caret-position="-2072">
+                  <caret line="88" column="8" selection-start-line="88" selection-start-column="8" selection-end-line="91" selection-end-column="35" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -59,10 +57,20 @@
               </provider>
             </entry>
           </file>
+          <file leaf-file-name="dates_tricks.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/assets/dates_tricks.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="578">
+                  <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
           <file leaf-file-name="helpers.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/assets/helpers.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3126">
+                <state relative-caret-position="71">
                   <caret line="231" column="0" selection-start-line="231" selection-start-column="0" selection-end-line="231" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#14#0" expanded="true" />
@@ -74,18 +82,18 @@
           <file leaf-file-name="checkinoutview_controller.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/checkinoutview_controller.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="43">
+                <state relative-caret-position="17">
                   <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="schedulesview_controller.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="schedulesview_controller.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/schedulesview_controller.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="750">
-                  <caret line="143" column="0" selection-start-line="143" selection-start-column="0" selection-end-line="143" selection-end-column="0" />
+                <state relative-caret-position="17">
+                  <caret line="98" column="48" selection-start-line="98" selection-start-column="48" selection-end-line="98" selection-end-column="48" />
                   <folding />
                 </state>
               </provider>
@@ -98,7 +106,7 @@
           <file leaf-file-name="sql.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/assets/sql.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-152">
+                <state relative-caret-position="4420">
                   <caret line="264" column="28" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
                   <folding />
                 </state>
@@ -108,8 +116,8 @@
           <file leaf-file-name="work_day_tools.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/assets/work_day_tools.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="678">
-                  <caret line="400" column="41" selection-start-line="400" selection-start-column="41" selection-end-line="400" selection-end-column="41" />
+                <state relative-caret-position="400">
+                  <caret line="29" column="43" selection-start-line="29" selection-start-column="43" selection-end-line="29" selection-end-column="43" />
                   <folding />
                 </state>
               </provider>
@@ -118,7 +126,7 @@
           <file leaf-file-name="anviz_reader.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/assets/anviz_reader.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="467">
+                <state relative-caret-position="527">
                   <caret line="38" column="53" selection-start-line="38" selection-start-column="53" selection-end-line="38" selection-end-column="53" />
                   <folding>
                     <element signature="e#28#38#0" expanded="true" />
@@ -130,8 +138,8 @@
           <file leaf-file-name="mainview_controller.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/mainview_controller.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1239">
-                  <caret line="84" column="25" selection-start-line="84" selection-start-column="25" selection-end-line="85" selection-end-column="23" />
+                <state relative-caret-position="663">
+                  <caret line="47" column="23" selection-start-line="47" selection-start-column="23" selection-end-line="47" selection-end-column="23" />
                   <folding />
                 </state>
               </provider>
@@ -197,7 +205,6 @@
         <option value="$PROJECT_DIR$/workersview_controller.py" />
         <option value="$PROJECT_DIR$/assets/holidayMapper.py" />
         <option value="$USER_HOME$/Documents/LIBROS/Informática/Python/PyQt/pyqt Examples/chap16/genericdelegates.py" />
-        <option value="$PROJECT_DIR$/assets/dates_tricks.py" />
         <option value="$PROJECT_DIR$/sandbox/prueba.py" />
         <option value="$PROJECT_DIR$/configview_controller.py" />
         <option value="$PROJECT_DIR$/daysoffview_controller.py" />
@@ -205,11 +212,12 @@
         <option value="$PROJECT_DIR$/start.py" />
         <option value="$PROJECT_DIR$/assets/anviz_reader.py" />
         <option value="$PROJECT_DIR$/assets/helpers.py" />
-        <option value="$PROJECT_DIR$/assets/printReport.py" />
         <option value="$PROJECT_DIR$/checkinoutview_controller.py" />
         <option value="$PROJECT_DIR$/assets/work_day_tools.py" />
-        <option value="$PROJECT_DIR$/mainview_controller.py" />
         <option value="$PROJECT_DIR$/schedulesview_controller.py" />
+        <option value="$PROJECT_DIR$/mainview_controller.py" />
+        <option value="$PROJECT_DIR$/assets/dates_tricks.py" />
+        <option value="$PROJECT_DIR$/assets/printReport.py" />
       </list>
     </option>
   </component>
@@ -275,7 +283,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -310,7 +318,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -339,7 +347,7 @@
       <recent name="C:\Users\Keko\Documents\PyExcel\ui" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.schedulesview_controller">
+  <component name="RunManager" selected="Python.start">
     <configuration default="false" name="daysoffview_controller" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -568,8 +576,8 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.schedulesview_controller" />
-        <item index="1" class="java.lang.String" itemvalue="Python.start" />
+        <item index="0" class="java.lang.String" itemvalue="Python.start" />
+        <item index="1" class="java.lang.String" itemvalue="Python.schedulesview_controller" />
         <item index="2" class="java.lang.String" itemvalue="Python.printReport" />
         <item index="3" class="java.lang.String" itemvalue="Python.daysoffview_controller" />
         <item index="4" class="java.lang.String" itemvalue="Python.prueba" />
@@ -670,7 +678,14 @@
       <option name="project" value="LOCAL" />
       <updated>1468203658684</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Fase2 de desarrollo&#10;">
+      <created>1477433106361</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1477433106361</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -713,16 +728,16 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1358" y="-8" width="1936" height="1216" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14805058" sideWeight="0.41091955" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.087987356" sideWeight="0.41091955" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32287824" sideWeight="0.4975018" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40337422" sideWeight="0.44851795" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933578" sideWeight="0.49126637" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35332105" sideWeight="0.43117088" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23892988" sideWeight="0.5514821" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21217713" sideWeight="0.43117088" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23708487" sideWeight="0.5514821" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1459431" sideWeight="0.39933443" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37546125" sideWeight="0.397474" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37546125" sideWeight="0.397474" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19478528" sideWeight="0.58908045" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23523985" sideWeight="0.49367088" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -786,11 +801,6 @@
           <url>file://$PROJECT_DIR$/sandbox/workedtimeCalculus.py</url>
           <option name="timeStamp" value="75" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/mainview_controller.py</url>
-          <line>174</line>
-          <option name="timeStamp" value="217" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -802,7 +812,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="218" />
+      <option name="time" value="219" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -1026,13 +1036,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assets/dates_tricks.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="25" column="25" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/-1571908645/PyQt4/QtCore/QAbstractItemModel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2936">
@@ -1066,45 +1069,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
           <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assets/sql.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-152">
-          <caret line="264" column="28" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assets/helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3126">
-          <caret line="231" column="0" selection-start-line="231" selection-start-column="0" selection-end-line="231" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assets/printReport.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4879">
-          <caret line="287" column="54" selection-start-line="287" selection-start-column="54" selection-end-line="287" selection-end-column="54" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/start.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2380">
-          <caret line="140" column="27" selection-start-line="140" selection-start-column="27" selection-end-line="140" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1112,13 +1076,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="700">
           <caret line="57" column="31" selection-start-line="57" selection-start-column="31" selection-end-line="57" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/sql.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4420">
+          <caret line="264" column="28" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/anviz_reader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="467">
+        <state relative-caret-position="527">
           <caret line="38" column="53" selection-start-line="38" selection-start-column="53" selection-end-line="38" selection-end-column="53" />
           <folding>
             <element signature="e#28#38#0" expanded="true" />
@@ -1126,35 +1097,73 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assets/work_day_tools.py">
+    <entry file="file://$PROJECT_DIR$/start.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="678">
-          <caret line="400" column="41" selection-start-line="400" selection-start-column="41" selection-end-line="400" selection-end-column="41" />
+        <state relative-caret-position="119">
+          <caret line="146" column="44" selection-start-line="146" selection-start-column="44" selection-end-line="146" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="71">
+          <caret line="231" column="0" selection-start-line="231" selection-start-column="0" selection-end-line="231" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schedulesview_controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="98" column="48" selection-start-line="98" selection-start-column="48" selection-end-line="98" selection-end-column="48" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/checkinoutview_controller.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="43">
+        <state relative-caret-position="17">
           <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/schedulesview_controller.py">
+    <entry file="file://$PROJECT_DIR$/assets/work_day_tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="750">
-          <caret line="143" column="0" selection-start-line="143" selection-start-column="0" selection-end-line="143" selection-end-column="0" />
+        <state relative-caret-position="400">
+          <caret line="29" column="43" selection-start-line="29" selection-start-column="43" selection-end-line="29" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/dates_tricks.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mainview_controller.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1239">
-          <caret line="84" column="25" selection-start-line="84" selection-start-column="25" selection-end-line="85" selection-end-column="23" />
+        <state relative-caret-position="663">
+          <caret line="47" column="23" selection-start-line="47" selection-start-column="23" selection-end-line="47" selection-end-column="23" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/printReport.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2072">
+          <caret line="88" column="8" selection-start-line="88" selection-start-column="8" selection-end-line="91" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -86,14 +86,17 @@ class PrintReport(QtCore.QObject):
         if LAST_REGISTER == 0:
             return
 
-        from_date = printFilter.index(FIRST_REGISTER, self.WDH['day']).data().toPyDateTime().date()
-        to_date = printFilter.index(LAST_REGISTER, self.WDH['day']).data().toPyDateTime().date()
+        date1 = printFilter.index(FIRST_REGISTER, self.WDH['day']).data().toPyDateTime().date()
+        date2 = printFilter.index(LAST_REGISTER, self.WDH['day']).data().toPyDateTime().date()
+        from_date = min(date1, date2)
+        to_date = max(date1, date2)
 
         not_css = {"td": "padding:5px;",
                    "table": "border-width: 1px;border-style: solid;border-color: black;color: black;"}
         html = ""
 
         for date in md.dates_range(from_date, to_date):
+
             printFilter.setSingleDateFilter(date)
             if printFilter.rowCount() == 0: continue
             html += ("<html>"
@@ -152,14 +155,12 @@ class PrintReport(QtCore.QObject):
                         else:
                             item = printFilter.index(row, column).data()
                         html += "<td align=center style='{}'>".format(not_css["td"])
-                        print(self.WDH)
-                        print(column, item)
                         html += item
                         html += "</td>"
 
                     html += "<td style='{}'></td>".format(not_css["td"])
                     html += "</tr>"
-                html += "</table>"
+                html += "</table><br>"
 
             # html += "<br>"*6
             # html += "<hr width=300>"
@@ -258,6 +259,13 @@ class PrintReport(QtCore.QObject):
 
         printFilter = tool.TotalizeWorkedTime(self.sourceModel)
 
+        upper = self.sourceModel.index(0, 1).data()
+        lower = self.sourceModel.index(
+                             self.sourceModel.rowCount() - 1,
+                             1).data()
+        fdate = min(upper, lower).toPyDateTime().date()
+        tdate = max(upper, lower).toPyDateTime().date()
+
         # Si no hay registros retorna None
         if printFilter.rowCount() == 0:
             return
@@ -272,6 +280,8 @@ class PrintReport(QtCore.QObject):
                  "<td align=right valign=bottom style='padding-left:450px'>"
                  "<div style='font-size:25px'><b>TIEMPO TOTAL<br>DE ASISTENCIAS</b></div></td>"
                  "</tr></table><br><hr><br>")
+        html += "El analisis abarca desde el {} hasta el {}<br>".format(md.dateToString(fdate),
+                                                                        md.dateToString(tdate))
 
         html += "<table cellspacing='0' style='{}'>".format(not_css["table"])
         html += ("<tr>"

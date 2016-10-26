@@ -85,7 +85,7 @@ class MyDates:
     @staticmethod
     def dateToString(d, option='default'):
         if option == 'default':
-            return '{}, {} de {} de {}'.format(
+            return '{} {} de {} de {}'.format(
                 MyDates.dayName(d),
                 d.day, MyDates.monthName(d.month),
                 d.year
