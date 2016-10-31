@@ -17,6 +17,8 @@ Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
  INTIME_1, OUTTIME_1, INTIME_2, OUTTIME_2, INTIME_3, OUTTIME_3,
  SHIFT, WORKED_TIME, EXTRA_TIME, ABSENT_TIME) = list(range(13))
 
+# TODO agregar un sistema de seguridad q clasifique a los usuarios y les otorgue distintos privilegios
+
 
 class MainView(Ui_MainWindow, QtBaseClass):
     def __init__(self):
@@ -121,6 +123,8 @@ class MainView(Ui_MainWindow, QtBaseClass):
         else:
             helpers.PopUps.inform_user("not implemented!")
 
+        self.updateModel()
+
     @QtCore.pyqtSlot("QString")
     def on_qworkers_currentIndexChanged(self, text):
         if text == "Todos":
@@ -203,6 +207,19 @@ class MainView(Ui_MainWindow, QtBaseClass):
     def documentCreated(self):
         from assets.helpers import PopUps
         PopUps.inform_user("El documento fue creado exitosamente")
+
+    def updateModel(self):
+        self.model.select()
+
+        while self.model.canFetchMore():
+            self.model.fetchMore()
+
+        self.calculusModel = tool.CalculusModel(self)
+        self.calculusModel.setSourceModel(self.model)
+        self.calculusModel.calculateWorkedHours()
+
+        self.tableView.setItemDelegate(tool.WorkDayDelegate(self))
+
 
 
 if __name__ == "__main__":

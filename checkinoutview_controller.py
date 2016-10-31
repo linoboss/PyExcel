@@ -28,6 +28,9 @@ class Checkinoutview_Controller(Ui_MainWindow, QtBaseClass):
                               "Userid", "Name"))
         model.select()
 
+        while model.canFetchMore():
+            model.fetchMore()
+
         self.dateFilter = tool.DateFilterProxyModel(self)
         self.dateFilter.setSourceModel(model)
         self.dateFilter.setFilterKeyColumn(model.fieldIndex("CheckTime"))

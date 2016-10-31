@@ -162,7 +162,7 @@ class AnvizRegisters:
                             "BDate DATETIME, "
                             "TDate DATETIME, "
                             "Description VARCHAR(255), "
-                            "Type INTEGER "
+                            "Type INTEGER"
                             ")")
         elif name == "WorkerPassTypes":
             self.query.exec("CREATE TABLE WorkerPassTypes "
@@ -224,17 +224,16 @@ class AnvizRegisters:
                             "   Schedule c "
                             "       ON (b.Schid = c.Schid)")
         elif option == "byId":
-            self.query.exec(
-                "SELECT DISTINCT c.Schid, a.Timeid, "
-                "                Intime, Outtime, BIntime, EIntime, BOuttime, EOuttime "
-                "FROM ("
-                "   TimeTable a "
-                "   INNER JOIN "
-                "   SchTime b "
-                "       ON (a.Timeid = b.Timeid)) "
-                "   INNER JOIN "
-                "   Schedule c "
-                "       ON (b.Schid = c.Schid)")
+            self.query.exec("SELECT DISTINCT c.Schid, a.Timeid, "
+                            "   Intime, Outtime, BIntime, EIntime, BOuttime, EOuttime "
+                            "FROM ("
+                            "   TimeTable a "
+                            "   INNER JOIN "
+                            "   SchTime b "
+                            "       ON (a.Timeid = b.Timeid)) "
+                            "   INNER JOIN "
+                            "   Schedule c "
+                            "       ON (b.Schid = c.Schid)")
         else:
             raise KeyError("INVALID OPTION \"{}\", only available: byName and byId".format(option))
 

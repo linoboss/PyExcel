@@ -19,7 +19,6 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
 
         # widgets de complemento
         self.qhdays = QtGui.QSpinBox()
-        self.qhdays.setValue(1)
         self.qdayofftype = QtGui.QSpinBox()
         self.qdayofftype.setValue(3)
         self.qname = QtGui.QLineEdit()
@@ -66,17 +65,61 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
         model = self.mapper.model()
 
         option = self.stackedWidget.currentIndex()
-        if option == 2:
+        if option == 0:
+            self.qhdays.setValue(1)
+        elif option == 2:
             self.qdayofftype.setValue(2)
         elif option == 3:
             self.qdayofftype.setValue(1)
 
-        # Creation
         self.qname.setText(
             self.selectedWorkerid()
         )
+
+        workdays_model = QtSql.QSqlTableModel()
+        workdays_model.setTable("WorkDays")
+        workdays_model.select()
+        while workdays_model.canFetchMore(): workdays_model.fetchMore()
+        workdays_model.setEditStrategy(workdays_model.OnManualSubmit)
+
+        if option < 2:
+            # National date and SpecialDate
+            nameFilter = '.*'
+            fdate = self.mapper.mappedWidgetAt(2).date()
+            days = self.mapper.mappedWidgetAt(3).value()
+            tdate = fdate.addDays(days - 1)
+            keyColumn = workdays_model.fieldIndex("Holidayid")
+
+        else:
+            # WorkerPass and Vacations
+            nameFilter = self.mapper.mappedWidgetAt(1).text()
+            fdate = self.mapper.mappedWidgetAt(2).date()
+            tdate = self.mapper.mappedWidgetAt(3).date()
+            keyColumn = workdays_model.fieldIndex("WPid")
+
+        nameproxymodel = QtGui.QSortFilterProxyModel()
+        nameproxymodel.setSourceModel(workdays_model)
+        nameproxymodel.setFilterKeyColumn(workdays_model.fieldIndex("worker"))
+        nameproxymodel.setFilterRegExp(nameFilter)
+
+        dateproxymodel = DateFilterProxyModel()
+        dateproxymodel.setSourceModel(nameproxymodel)
+        dateproxymodel.setFilterKeyColumn(workdays_model.fieldIndex("day"))
+        dateproxymodel.setRangeDateFilter(fdate, tdate)
+        if option == 0: dateproxymodel.ignoreYear = True
+
         self.mapper.submit()
         model.submitAll()
+
+        # Its necesary to wait for the database to autoincrement the id and assign a value
+        item = model.index(model.rowCount()-1, 0).data()
+
+        for row in range(dateproxymodel.rowCount()):
+            index = dateproxymodel.index(row, keyColumn)
+            dateproxymodel.setData(index, item)
+
+        workdays_model.submitAll()
+
         model.addRow()
         self.mapper.toLast()
 
@@ -84,16 +127,55 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qdelete_clicked(self):
-        model = self.mapper.model()
-        deleterows = []
-        for index in self.tableView.selectedIndexes():
-            row = model.sourceIndex(index).row()
-            if row not in deleterows:
-                deleterows.append(row)
-        model.select()
 
-        for row in deleterows:
-            model.removeRow(row)
+        model = self.mapper.model()
+
+        # As the Selection behavior of the tableView is set to singleRowSelection,
+        # there can only be the first row.
+        # But warning, the index error on not selectedIndex must be avoided
+        if len(self.tableView.selectedIndexes()) == 0:
+            return
+        tindex = self.tableView.selectedIndexes()[0]
+        index = model.sourceIndex(tindex)
+        item = model.index(index.row(), 0).data()
+
+        # To delete a register from the holidays and workerPass table,
+        # the reference from the workdays table must also be removed
+        workdays_model = QtSql.QSqlTableModel()
+        workdays_model.setTable("WorkDays")
+        workdays_model.select()
+        while workdays_model.canFetchMore(): workdays_model.fetchMore()
+        workdays_model.setEditStrategy(workdays_model.OnManualSubmit)
+
+        # Set column on the workdays model related to the current table being edited
+        keyColumn = (workdays_model.fieldIndex("Holidayid") if self.stackedWidget.currentIndex() < 2
+                     else workdays_model.fieldIndex("WPid"))
+
+        proxymodel = QtGui.QSortFilterProxyModel()
+        proxymodel.setSourceModel(workdays_model)
+        proxymodel.setFilterKeyColumn(keyColumn)
+        proxymodel.setFilterRegExp(str(item))
+
+        # Scan the proxymodel and remove the references to the holidayid or workerpasid
+        # A List of indexes must be created else the proxymodel updates after each record
+        # modification will bypass some of the values
+        windexes = []
+        for prow in range(proxymodel.rowCount()):
+            pindex = proxymodel.index(prow, keyColumn)
+            windex = proxymodel.mapToSource(pindex)
+            windexes.append(windex)
+
+        for windex in windexes:
+            record = workdays_model.record(windex.row())
+            record.setValue(keyColumn, None)
+            workdays_model.setRecord(windex.row(), record)
+
+        workdays_model.submitAll()
+
+        # Resets the model, allowing deletion
+        model.select()
+        print(index.row())
+        model.removeRow(index.row())
         model.submitAll()
         model.addRow()
         self.mapper.toLast()

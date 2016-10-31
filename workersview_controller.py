@@ -2,13 +2,14 @@ import sys
 from PyQt4 import uic
 from PyQt4 import QtGui, QtSql, QtCore
 import assets.sql as sql
+import assets.helpers as helpers
 
 # Uic Loader
 qtCreatorFile = "ui\\workersview.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
 
 
-(USERID, NAME, SEX, ISACTIVE) = range(4)
+(USERID, NAME, SEX) = range(3)
 ISACTIVE = 28
 
 
@@ -45,31 +46,44 @@ class Workersview_controller(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot()
     def on_qdelete_clicked(self):
-        return
-        # TODO probar si ya funciona
-        userinfo_model = self.tableView.model()
+        table_model = self.tableView.model()
         selection = self.tableView.selectionModel()
         row = selection.currentIndex().row()
-        worker_id = userinfo_model.index(row, 0).data()
+        worker_id = table_model.index(row, 0).data()
+        worker_name = table_model.index(row, 1).data()
+        worker_gender = table_model.index(row, 2).data()
+        letter = 'a' if worker_gender == "Femenino" else 'o'
 
+        user_ans = helpers.PopUps.ask_user_to("{} sera eliminad{} de la base de "
+                                              "datos permanentemente, proceder?".format(worker_name, letter))
+        if user_ans == helpers.YES:
+            self.removeWorker(worker_id)
+            table_model.select()
+
+    @staticmethod
+    def removeWorker(worker_id):
         workdays_model = QtSql.QSqlTableModel()
         workdays_model.setTable("WorkDays")
-        workdays_model.setFilter("worker = '{}'".format(worker_id))
+        workdays_model.setFilter("worker='{}'".format(worker_id))
         workdays_model.select()
-        print(workdays_model.rowCount(), worker_id)
         for row in range(workdays_model.rowCount()):
             workdays_model.removeRow(row)
         workdays_model.submitAll()
 
         usershift_model = QtSql.QSqlTableModel()
         usershift_model.setTable("UserShift")
-        usershift_model.setFilter("Userid = '{}'".format(worker_id))
+        usershift_model.setFilter("Userid='{}'".format(worker_id))
         usershift_model.select()
         usershift_model.removeRow(0)
         usershift_model.submitAll()
 
-        userinfo_model.removeRow(row)
+        userinfo_model = QtSql.QSqlTableModel()
+        userinfo_model.setTable("Userinfo")
+        userinfo_model.setFilter("Userid='{}'".format(worker_id))
+        userinfo_model.select()
+        userinfo_model.removeRow(0)
         userinfo_model.submitAll()
+        userinfo_model.select()
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):

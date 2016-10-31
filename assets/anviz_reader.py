@@ -63,28 +63,31 @@ class AnvizReader:
     def updateTable(self):
         holiday, specialdate = helpers.holidays()
         daysoff = helpers.workerPass()
-        from_date = self.anvRgs.max_date_of("WorkDays")
+        from_ = self.anvRgs.max_date_of("WorkDays")
 
-        if from_date is None:
-            from_date = self.anvRgs.min_date_of("Checkinout")
+        if from_ is None:
+            from_ = self.anvRgs.min_date_of("Checkinout")
 
-        self.anvRgs.deleteDay(from_date)
-        self.anvRgs.deleteDay(from_date)
+        from_datetime = dt.datetime(from_.year, from_.month, from_.day,
+                                    0, 0, 0)
 
-        to_date = self.anvRgs.max_date_of("Checkinout")
+        self.anvRgs.deleteDay(from_datetime)
+        self.anvRgs.deleteDay(from_datetime)
+
+        to_datetime = self.anvRgs.max_date_of("Checkinout")
         """
         Iterate over dates
         """
-        if (md.isValid(to_date) is not True
-                or md.isValid(to_date) is not True):
+        if (md.isValid(to_datetime) is not True
+                or md.isValid(to_datetime) is not True):
             return
-        dates_range = md.dates_range(from_date.date(), to_date.date())
+        dates_range = md.dates_range(from_datetime.date(), to_datetime.date())
 
         self.anvRgs.query.exec("SELECT Logid, Userid, CheckTime "
                                "FROM Checkinout "
                                "WHERE CheckTime >= #{from_date}# AND CheckTime <= #{to_date}# "
-                               "ORDER BY CheckTime ASC".format(from_date=from_date,
-                                                               to_date=to_date))
+                               "ORDER BY CheckTime ASC".format(from_date=from_datetime,
+                                                               to_date=to_datetime))
 
         LOGID, USERID, CHECKTIME = 0, 1, 2
 

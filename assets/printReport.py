@@ -133,7 +133,7 @@ class PrintReport(QtCore.QObject):
                     QtGui.QApplication.processEvents()
 
                     for column in range(13):
-                        if column == self.WDH['id']:
+                        if column == self.WDH['workdayid']:
                             continue
                         elif column == self.WDH['day']:
                             continue
@@ -217,7 +217,7 @@ class PrintReport(QtCore.QObject):
             QtGui.QApplication.processEvents()
 
             for column in range(13):
-                if column == self.WDH['id']:
+                if column == self.WDH['workdayid']:
                     continue
                 elif column == self.WDH['worker']:
                     continue

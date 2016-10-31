@@ -16,7 +16,7 @@ class StartDlg(Ui_MainWindow, QtBaseClass):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setImg("../../../Users/Lino Bossio/Pictures/1965243.jpg")
+        self.setImg("images/1965243.jpg")
 
     def setText(self, text):
         self.info.setText(text)

@@ -7,6 +7,7 @@ NO = QtGui.QMessageBox.No
 
 
 class PopUps:
+
     @staticmethod
     def ask_user_to(text, infotext='', detailedtext=''):
         messageBox = QtGui.QMessageBox()

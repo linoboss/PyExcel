@@ -65,12 +65,13 @@ class WorkDayDelegate(QtGui.QStyledItemDelegate):
         isholiday = isinstance(model.index(row, 13).data(), int)
         isdayoff = isinstance(model.index(row, 14).data(), int)
 
-        if isdayoff:
-            color = QtGui.QColor(220, 255, 220)
-        elif isholiday:
-            color = QtGui.QColor(255, 255, 200)
-        elif isnotregular:
-            color = QtGui.QColor(240, 240, 240)
+        if column > DAY:
+            if isdayoff:
+                color = QtGui.QColor(220, 255, 220)
+            elif isholiday:
+                color = QtGui.QColor(255, 255, 200)
+            elif isnotregular:
+                color = QtGui.QColor(240, 240, 240)
 
         painter.save()
         painter.fillRect(option.rect, color)
@@ -101,6 +102,7 @@ class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
         self.to_date = None
         self.mode = "no filter"
         self.key_column = DAY
+        self.ignoreYear = False
 
     def setFilterKeyColumn(self, column):
         self.key_column = column
@@ -139,7 +141,23 @@ class DateFilterProxyModel(QtGui.QSortFilterProxyModel):
             return date == self.single_date
 
         elif self.mode == "range":
-            return self.from_date <= date <= self.to_date
+            fdate = self.from_date
+            tdate = self.to_date
+
+            # This segment allows to compare dates in the conext of
+            # the cyclical nature of the calendar
+            if self.ignoreYear:
+                date = QtCore.QDate(2000,
+                                    date.month(),
+                                    date.day())
+                fdate = QtCore.QDate(2000,
+                                     fdate.month(),
+                                     fdate.day())
+                tdate = QtCore.QDate(2000,
+                                     tdate.month(),
+                                     tdate.day())
+
+            return fdate <= date <= tdate
 
         elif self.mode == "no filter":
             return True
