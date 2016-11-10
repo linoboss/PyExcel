@@ -2,8 +2,6 @@ import sys
 from PyQt4 import uic
 from PyQt4 import QtGui, QtSql, QtCore
 import assets.sql as sql
-import assets.helpers as helpers
-import assets.work_day_tools as tool
 
 # Uic Loader
 qtCreatorFile = "ui\\schedulesview.ui"
@@ -46,7 +44,7 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
         model.setHeaderData(BOUTTIME, QtCore.Qt.Horizontal, "Inicio de\nSalida")
         model.setHeaderData(EOUTTIME, QtCore.Qt.Horizontal, "Fin de la\nSalida")
 
-        proxymodel = QtGui.QSortFilterProxyModel(self)
+        proxymodel = ProxyModel(self)
         proxymodel.setSourceModel(model)
         proxymodel.setFilterKeyColumn(0)
         proxymodel.setFilterRegExp(
@@ -90,10 +88,20 @@ class Schedulesview_Controller(Ui_MainWindow, QtBaseClass):
                 proxy_schtime_table.index(row, 2).data()
             ))
         options = list(set(list_))
-        print(options)
         items = list(map(lambda x: str(x[1]), options))
         regex_filter = '|'.join(items)
         return regex_filter
+
+
+class ProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.parent = parent
+
+    def setData(self, index, item, int_role=None):
+        sIndex = self.mapToSource(index)
+        smodel = self.sourceModel()
+        smodel.setData(sIndex, item)
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):
@@ -117,9 +125,10 @@ class CustomDelegate(QtGui.QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         column = index.column()
         if column == TIMENAME:
-            return QtGui.QTextEdit(parent)
+            editor = None  # QtGui.QTextEdit(parent)
         else:
-            return QtGui.QTimeEdit(parent)
+            editor = QtGui.QTimeEdit(parent)
+        return editor
 
     def setEditorData(self, editor, index):
         column = index.column()

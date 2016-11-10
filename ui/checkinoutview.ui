@@ -63,6 +63,13 @@
      </item>
     </layout>
    </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="qloadmore">
+     <property name="text">
+      <string>Cargar mas</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

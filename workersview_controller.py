@@ -109,9 +109,11 @@ class CustomDelegate(QtGui.QStyledItemDelegate):
         column = index.column()
         if column == ISACTIVE:
             editor = QtGui.QComboBox(parent)
-            return editor
+        elif column == SEX:
+            editor = QtGui.QComboBox(parent)
         else:
-            return QtGui.QTextEdit(parent)
+            editor = QtGui.QTextEdit(parent)
+        return editor
 
     def setEditorData(self, editor, index):
         column = index.column()
@@ -120,6 +122,9 @@ class CustomDelegate(QtGui.QStyledItemDelegate):
             # editor = QtGui.QComboBox()
             editor.addItems('No Si'.split())
             editor.setCurrentIndex(item)
+        elif column == SEX:
+            editor.addItems("Femenino Masculino".split())
+            editor.setCurrentText(item)
         else:
             editor.setText(item)
 
@@ -130,6 +135,8 @@ class CustomDelegate(QtGui.QStyledItemDelegate):
         # model = QtSql.QSqlRelationalTableModel()
         if isinstance(editor, QtGui.QTextEdit):
             item = editor.toPlainText()
+        elif isinstance(editor, QtGui.QComboBox):
+            item = editor.currentText()
         else:
             # editor = QtGui.QComboBox()
             item = editor.currentIndex()

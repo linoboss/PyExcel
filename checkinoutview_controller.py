@@ -20,20 +20,17 @@ class Checkinoutview_Controller(Ui_MainWindow, QtBaseClass):
         self.setupUi(self)
         self.parent = parent
 
-        model = QtSql.QSqlRelationalTableModel(self)
-        model.setTable('Checkinout')
-        model.setRelation(USERID,
-                          QtSql.QSqlRelation(
-                              "Userinfo",
-                              "Userid", "Name"))
-        model.select()
-
-        while model.canFetchMore():
-            model.fetchMore()
+        self.model = QtSql.QSqlRelationalTableModel(self)
+        self.model.setTable('Checkinout')
+        self.model.setRelation(USERID,
+                               QtSql.QSqlRelation(
+                                   "Userinfo",
+                                   "Userid", "Name"))
+        self.model.select()
 
         self.dateFilter = tool.DateFilterProxyModel(self)
-        self.dateFilter.setSourceModel(model)
-        self.dateFilter.setFilterKeyColumn(model.fieldIndex("CheckTime"))
+        self.dateFilter.setSourceModel(self.model)
+        self.dateFilter.setFilterKeyColumn(self.model.fieldIndex("CheckTime"))
 
         self.tableView.setModel(self.dateFilter)
         self.tableView.setItemDelegate(CustomDelegate())
@@ -43,11 +40,13 @@ class Checkinoutview_Controller(Ui_MainWindow, QtBaseClass):
         self.tableView.setSortingEnabled(True)
         self.tableView.resizeColumnsToContents()
 
-        self.dateEdit.setDate(
-            QtCore.QDate().currentDate()
-        )
+        curr_date = QtCore.QDate().currentDate()
+        one_month_back = curr_date.addMonths(-1)
+        self.dateEdit.setDate(curr_date)
+
         self.dateFilter.removeFilter()
 
+        self.model.setFilter("CheckTime >= #{}#".format(one_month_back))
 
     @QtCore.pyqtSlot("QDate")
     def on_dateEdit_dateChanged(self, date):
@@ -56,6 +55,14 @@ class Checkinoutview_Controller(Ui_MainWindow, QtBaseClass):
     @QtCore.pyqtSlot()
     def on_pushButton_clicked(self):
         self.dateFilter.removeFilter()
+
+    @QtCore.pyqtSlot()
+    def on_qloadmore_clicked(self):
+        self.model.setFilter("")
+        self.model.select()
+        while self.model.canFetchMore():
+            self.model.fetchMore()
+            QtGui.QApplication.processEvents()
 
 
 class CustomDelegate(QtGui.QStyledItemDelegate):

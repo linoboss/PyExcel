@@ -7,7 +7,7 @@ import assets.work_day_tools as tool
 import assets.helpers as helpers
 import configview_controller
 from assets.printReport import PrintReport
-
+from passwordview_controller import Passwordview_Controller
 
 qtCreatorFile = "ui\\MainView.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
@@ -41,10 +41,9 @@ class MainView(Ui_MainWindow, QtBaseClass):
                                                          "Schname"))
         self.model.sort(DAY, Qt.AscendingOrder)
         self.model.select()
+        self.model.sort(1, Qt.DescendingOrder)
         while self.model.canFetchMore():
             self.model.fetchMore()
-
-        self.model.sort(1, Qt.DescendingOrder)
 
         self.calculusModel = tool.CalculusModel(self)
         self.calculusModel.setSourceModel(self.model)
@@ -99,6 +98,9 @@ class MainView(Ui_MainWindow, QtBaseClass):
 
     @QtCore.pyqtSlot("QAction*")
     def on_menubar_triggered(self, action):
+        if Passwordview_Controller().exec() != QtGui.QDialog.Accepted:
+            return
+
         if action is self.action_database:
             configview = configview_controller.ScheduleConfiguration_Controller(self)
             self.connect(configview, QtCore.SIGNAL('dbChanged()'), self.ask_user_to_reopen_program)
@@ -219,7 +221,6 @@ class MainView(Ui_MainWindow, QtBaseClass):
         self.calculusModel.calculateWorkedHours()
 
         self.tableView.setItemDelegate(tool.WorkDayDelegate(self))
-
 
 
 if __name__ == "__main__":

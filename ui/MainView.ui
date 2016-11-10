@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Ventana principal</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -37,7 +37,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_details">
            <attribute name="title">
@@ -106,7 +106,7 @@
                <item>
                 <widget class="QLabel" name="qdatefilter">
                  <property name="text">
-                  <string>Filtro:</string>
+                  <string>Fechas:</string>
                  </property>
                 </widget>
                </item>
