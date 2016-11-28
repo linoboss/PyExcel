@@ -2,7 +2,6 @@ import sys
 from PyQt4 import QtCore, QtGui, QtSql
 from assets.work_day_tools import DateFilterProxyModel
 from assets.anviz_reader import AnvizReader
-import datetime as dt
 from assets.dates_tricks import MyDates as md
 
 

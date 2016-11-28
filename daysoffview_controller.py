@@ -174,7 +174,6 @@ class Daysoffview_controller(Ui_MainWindow, QtBaseClass):
 
         # Resets the model, allowing deletion
         model.select()
-        print(index.row())
         model.removeRow(index.row())
         model.submitAll()
         model.addRow()
